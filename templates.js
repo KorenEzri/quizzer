@@ -37,14 +37,28 @@ const templates = {
         `are living in the city ${city_name}, ${country_name || state_name}`,
         ``,
       ],
-      countries: [`are there in ${continent_name}`, `fought in ${war_name}`, `were formed between the years ${random_year_range}`],
-      states: [`are there in ${country_name}`, `were formed between the years ${random_year_range}`]
+      countries: [
+        `are there in ${continent_name}`,
+        `fought in ${war_name}`,
+        `were formed between the years ${random_year_range}`,
+      ],
+      states: [
+        `are there in ${country_name}`,
+        `were formed between the years ${random_year_range}`,
+      ],
     },
     how_much_tails: {
-        time_did: [`${war_name} last?`, `it take for ${country_name} to get autonomy?`]
+      time_did: [
+        `${war_name} last?`,
+        `it take for ${country_name} to get autonomy?`,
+      ],
     },
     which_tails: {
-        is_the_busiest: [`time of year in ${country_name}`, `season in ${country_name}`, `time for ${tourist_activity} in ${country_name}`],
-    }
+      is_the_busiest: [
+        `time of year in ${country_name}`,
+        `season in ${country_name}`,
+        `time for ${tourist_activity} in ${country_name}`,
+      ],
+    },
   },
 };
