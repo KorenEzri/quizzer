@@ -7,7 +7,7 @@ const app = express();
 app.use(express.json());
 app.use(morgan("tiny"));
 app.use("/api", api);
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "/client/build/index.html"));
-});
+// app.get("*", (req, res) => {
+//   res.sendFile(path.join(__dirname, "/client/build/index.html"));
+// });
 module.exports = app;
