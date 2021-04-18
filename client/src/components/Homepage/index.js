@@ -11,7 +11,6 @@ import ChoiceBox from "../ChoiceBox";
 import BottomHUD from "../BottomHUD";
 import StartQuiz from "../StartQuiz";
 import Score from "../Scoreboard";
-import RateLastQuestion from "../RateLastQuestion";
 import network from "../../network";
 const baseUrl = "http://localhost:3001/api/questions/";
 
