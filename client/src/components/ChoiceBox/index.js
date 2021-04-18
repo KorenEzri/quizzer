@@ -16,7 +16,7 @@ const shuffleChoices = (array) => {
   return array;
 };
 
-export default function ChoiceBox({ choices, questionType }) {
+export default function ChoiceBox({ choices, questionType, handleQuizStart }) {
   const { rightChoice, falsies } = choices;
   if (!falsies) return null;
   const allChoices = Array.from(
@@ -46,6 +46,7 @@ export default function ChoiceBox({ choices, questionType }) {
                     anyChoice === rightChoice
                   }
                   index={index + 1}
+                  handleQuizStart={handleQuizStart}
                 />
               </div>
             );
@@ -57,6 +58,7 @@ export default function ChoiceBox({ choices, questionType }) {
                 key={"true"}
                 choice={allChoices[0].country}
                 isRight={allChoices[0].country === rightChoice.country}
+                handleQuizStart={handleQuizStart}
               />
             </div>
             <div className="choice__container">
@@ -64,6 +66,7 @@ export default function ChoiceBox({ choices, questionType }) {
                 key={"false"}
                 choice={allChoices[1].country}
                 isRight={allChoices[1].country === rightChoice.country}
+                handleQuizStart={handleQuizStart}
               />
             </div>
           </div>

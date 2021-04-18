@@ -1,8 +1,10 @@
-const questionsFailed = (state = 0, action) => {
+const initialState = {
+  failedCount: 0,
+};
+const questionsFailed = (state = initialState, action) => {
   switch (action.type) {
     case "SETFAILCOUNT":
-      const count = action.amount;
-      return count;
+      return { failedCount: state.failedCount + 1 };
     default:
       return state;
   }

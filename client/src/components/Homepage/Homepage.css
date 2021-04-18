@@ -55,6 +55,10 @@
   --duration: 5;
 }
 
+.duration_four {
+  --duration: 2.5;
+}
+
 .round-time-bar {
   margin: 1rem;
   overflow: hidden;

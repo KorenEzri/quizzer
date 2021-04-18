@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import setCurrentQuestion from "../../redux/redux-actions/setCurrentQuestion";
+import setQuestionsFailed from "../../redux/redux-actions/setQuestionsFailed";
 import classNames from "classnames";
 import "./Homepage.css";
 import Helpers from "../Helpers";
@@ -9,6 +10,7 @@ import Timer from "../Timer";
 import ChoiceBox from "../ChoiceBox";
 import BottomHUD from "../BottomHUD";
 import StartQuiz from "../StartQuiz";
+import Score from "../Scoreboard";
 import network from "../../network";
 const baseUrl = "http://localhost:3001/api/questions/";
 
@@ -17,8 +19,10 @@ export default function Homepage() {
   const [quizStart, setQuizStart] = useState(false);
   const [choices, setChoices] = useState([]);
   const [questionType, setQuestionType] = useState("");
-  const [difficulty, setDifficulty] = useState(3);
+  const [difficulty, setDifficulty] = useState(1);
   const [showTimer, setShowTimer] = useState(false);
+  const [questionInterval, setQuestionInterval] = useState("");
+  const [score, setScore] = useState(0);
   const { answered } = useSelector((state) => state);
   const { failed } = useSelector((state) => state);
   const { question } = useSelector((state) => state);
@@ -30,19 +34,19 @@ export default function Homepage() {
     setChoices(data.choices);
     setQuestionType(data.type);
     setShowTimer(true);
+    console.log(data.choices.rightChoice, difficulty);
   };
   const handleDifficultyLevel = (questionsAnswered) => {
-    if (questionsAnswered > 7) {
+    if (questionsAnswered > 3) {
       setDifficulty(2);
-    } else if (questionsAnswered > 12) {
+    }
+    if (questionsAnswered > 6) {
       setDifficulty(3);
     }
+    if (questionsAnswered > 12) {
+      setDifficulty(4);
+    }
   };
-
-  const handleQuizStart = async () => {
-    setQuizStart(true);
-  };
-
   const getTimerLength = (n) => {
     switch (n) {
       case 1:
@@ -51,26 +55,41 @@ export default function Homepage() {
         return 8700;
       case 3:
         return 5500;
+      case 4:
+        return 3000;
       default:
         return 12700;
     }
   };
-
-  useEffect(() => {
-    handleDifficultyLevel(answered);
-  }, [setCurrentQuestion]);
-
-  useEffect(() => {
-    (async () => {
+  const handleQuizStart = async (next, didClick) => {
+    if (next) {
+      clearInterval(questionInterval);
       await fetchQuestion();
-      const timer = setInterval(async () => {
+      setQuestionInterval(
+        setInterval(async () => {
+          await fetchQuestion();
+        }, getTimerLength(difficulty))
+      );
+      return;
+    }
+    await fetchQuestion();
+    setQuizStart(true);
+    setQuestionInterval(
+      setInterval(async () => {
+        if (!didClick) {
+          dispatch(setQuestionsFailed(failed.failedCount));
+        }
         await fetchQuestion();
-      }, getTimerLength(difficulty));
-      return () => {
-        clearInterval(timer);
-      };
+      }, getTimerLength(difficulty))
+    );
+  };
+
+  useEffect(() => {
+    (() => {
+      setScore(answered.answerCount - failed.failedCount);
+      handleDifficultyLevel(answered.answerCount);
     })();
-  }, [setCurrentQuestion]);
+  }, [answered.answerCount, failed.failedCount]);
 
   return quizStart ? (
     <div className="homepage-top-container">
@@ -85,6 +104,7 @@ export default function Homepage() {
               duration_one: difficulty === 1,
               duration_two: difficulty === 2,
               duration_three: difficulty === 3,
+              duration_four: difficulty === 4,
             })}
           >
             {showTimer && <Timer />}
@@ -93,10 +113,17 @@ export default function Homepage() {
             <Helpers />
           </div>
           <div className="choicebox-container">
-            <ChoiceBox choices={choices} questionType={questionType} />
+            <ChoiceBox
+              choices={choices}
+              questionType={questionType}
+              handleQuizStart={handleQuizStart}
+            />
           </div>
           <div className="bottomHUD-container">
             <BottomHUD />
+          </div>
+          <div className="scoreboard-container">
+            <Score playerScore={score} />
           </div>
         </div>
       )}

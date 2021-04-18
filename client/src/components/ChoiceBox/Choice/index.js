@@ -4,7 +4,7 @@ import setQuestionsAnswered from "../../../redux/redux-actions/setQuestionsAnswe
 import setQuestionsFailed from "../../../redux/redux-actions/setQuestionsFailed";
 import setCurrentQuestion from "../../../redux/redux-actions/setCurrentQuestion";
 
-export default function Choice({ choice, isRight, index }) {
+export default function Choice({ choice, isRight, index, handleQuizStart }) {
   let { answered } = useSelector((state) => state);
   let { failed } = useSelector((state) => state);
   const dispatch = useDispatch();
@@ -13,21 +13,18 @@ export default function Choice({ choice, isRight, index }) {
       key={`choice-${index}`}
       className="choicebox__choice"
       isright={`${isRight}`}
-      onClick={({ target }) => {
-        const isCorrect = target.getAttribute("isright");
+      onClick={async ({ target }) => {
+        const isCorrect = target.getAttribute("isright") === "true";
         if (isCorrect) {
-          dispatch(setQuestionsAnswered(answered++));
-          dispatch(setCurrentQuestion());
+          dispatch(setQuestionsAnswered(answered.answerCount));
+          await handleQuizStart("next", "didClick");
         } else {
-          dispatch(setQuestionsFailed(failed++));
-          dispatch(setCurrentQuestion());
+          dispatch(setQuestionsFailed(failed.failedCount));
+          await handleQuizStart("next", "didClick");
         }
-        console.log(answered, failed);
       }}
     >
-      <span key={`choice_span${index}`} className="choice__number">
-        {index} -
-      </span>
+      <span key={`choice_span${index}`} className="choice__number"></span>
       {choice}
     </li>
   );

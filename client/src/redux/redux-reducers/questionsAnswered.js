@@ -1,8 +1,10 @@
-const questionsAnswered = (state = 0, action) => {
+const initialState = {
+  answerCount: 0,
+};
+const questionsAnswered = (state = initialState, action) => {
   switch (action.type) {
     case "SETANSWERCOUNT":
-      const count = action.amount;
-      return count;
+      return { answerCount: state.answerCount + 1 };
     default:
       return state;
   }
