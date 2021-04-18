@@ -1,5 +1,6 @@
 import React from "react";
 import Choice from "./Choice";
+import "./ChoiceBox.css";
 
 const shuffleChoices = (array) => {
   let currentIndex = array.length,
@@ -18,13 +19,22 @@ const shuffleChoices = (array) => {
 export default function ChoiceBox({ choices, questionType }) {
   const { rightChoice, falsies } = choices;
   if (!falsies) return null;
-  const otherChoices = falsies.map((falseChoice) => {
-    return falseChoice[questionType] || falseChoice;
-  });
-  const allChoices = shuffleChoices(otherChoices.concat(rightChoice));
+
+  const allChoices = Array.from(
+    new Set(
+      shuffleChoices(
+        falsies
+          .map((falseChoice) => {
+            return falseChoice[questionType] || falseChoice;
+          })
+          .concat(rightChoice)
+      )
+    )
+  );
+
   return (
     <div className="choiceBox-component">
-      <ul>
+      <ul className="choice__list">
         {questionType !== "truefalse" ? (
           allChoices.map((choice, index) => {
             let anyChoice = choice[questionType] || choice;
@@ -44,12 +54,12 @@ export default function ChoiceBox({ choices, questionType }) {
             <Choice
               key={"true"}
               choice={allChoices[0].country}
-              isRight={allChoices[0].country === rightChoice}
+              isRight={allChoices[0].country === rightChoice.country}
             />
             <Choice
               key={"false"}
               choice={allChoices[1].country}
-              isRight={allChoices[1].country === rightChoice}
+              isRight={allChoices[1].country === rightChoice.country}
             />
           </div>
         )}

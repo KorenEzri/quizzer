@@ -1,0 +1,10 @@
+.choiceBox-component {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.choice__list {
+  list-style-type: none;
+}
+/*# sourceMappingURL=ChoiceBox.css.map */

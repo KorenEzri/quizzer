@@ -11,9 +11,14 @@ const { Sequelize } = require("sequelize");
 /////////////////////////////////////
 // FUNC generateRandomQuestion() => gets random question template and random country names
 const generateRandomQuestion = async () => {
-  const allCountries = await CountryList.findAll({
-    attributes: [Sequelize.fn("DISTINCT", Sequelize.col("Country")), "Country"],
-  });
+  const allCountries = shuffleArray(
+    await CountryList.findAll({
+      attributes: [
+        Sequelize.fn("DISTINCT", Sequelize.col("Country")),
+        "Country",
+      ],
+    })
+  );
   const templates = await Template.findAll();
   const randomTemplate = getRandomElements(templates, 1);
   const { template_reqs, template, template_ans_type } = randomTemplate[0];
@@ -331,5 +336,18 @@ const determineQuestionType = (reqs, ans_type) => {
   } else {
     return "data";
   }
+};
+const shuffleArray = (array) => {
+  let currentIndex = array.length,
+    temporaryValue,
+    randomIndex;
+  while (0 !== currentIndex) {
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+  return array;
 };
 module.exports = { generateRandomQuestion };
