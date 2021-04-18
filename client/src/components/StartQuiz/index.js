@@ -4,8 +4,8 @@ export default function StartQuiz({ handleQuizStart }) {
   return (
     <div className="start-quiz-component">
       <button
-        onClick={() => {
-          handleQuizStart();
+        onClick={async () => {
+          await handleQuizStart();
         }}
       >
         Start

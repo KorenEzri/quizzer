@@ -14,13 +14,13 @@
   position: relative;
   text-align: center;
   width: 70vw;
-  height: 45vh;
+  height: 65vh;
   min-height: 380px;
   margin-left: auto;
   margin-right: auto;
   background: linear-gradient(-45deg, #ee7752, #ee2270, #23a6d5, #23d5ab);
-  background-size: 400% 400%;
   animation: gradient 25s ease infinite;
+  background-size: 400% 400%;
 }
 .question__container {
   position: relative;
@@ -35,17 +35,6 @@
   padding-top: 30px;
 }
 
-@keyframes gradient {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
 .duration_one {
   --duration: 12;
 }
@@ -61,10 +50,19 @@
 }
 .round-time-bar div {
   height: 20px;
+  background: linear-gradient(
+    -45deg,
+    rgb(223, 0, 0),
+    rgb(190, 0, 0),
+    rgb(160, 2, 2),
+    rgb(141, 0, 0)
+  );
+  border-radius: 8px;
+  animation: gradient 0.02s ease infinite;
+  animation: timer-color-change 0.2s infinite;
   animation: roundtime calc(var(--duration) * 1s) steps(var(--duration))
     forwards;
   transform-origin: left center;
-  background: linear-gradient(to bottom, red, #900);
 }
 
 .round-time-bar[data-style="smooth"] div {
@@ -72,7 +70,17 @@
 }
 @keyframes roundtime {
   to {
-    /* More performant than `width` */
     transform: scaleX(0);
+  }
+}
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
   }
 }

@@ -17,14 +17,14 @@
   position: relative;
   text-align: center;
   width: 70vw;
-  height: 45vh;
+  height: 65vh;
   min-height: 380px;
   margin-left: auto;
   margin-right: auto;
   background: linear-gradient(-45deg, #ee7752, #ee2270, #23a6d5, #23d5ab);
-  background-size: 400% 400%;
   -webkit-animation: gradient 25s ease infinite;
           animation: gradient 25s ease infinite;
+  background-size: 400% 400%;
 }
 
 .question__container {
@@ -41,6 +41,56 @@
 .question {
   font-size: 26px;
   padding-top: 30px;
+}
+
+.duration_one {
+  --duration: 12;
+}
+
+.duration_two {
+  --duration: 8;
+}
+
+.duration_three {
+  --duration: 5;
+}
+
+.round-time-bar {
+  margin: 1rem;
+  overflow: hidden;
+}
+
+.round-time-bar div {
+  height: 20px;
+  background: linear-gradient(-45deg, #df0000, #be0000, #a00202, #8d0000);
+  border-radius: 8px;
+  -webkit-animation: gradient 0.02s ease infinite;
+          animation: gradient 0.02s ease infinite;
+  -webkit-animation: timer-color-change 0.2s infinite;
+          animation: timer-color-change 0.2s infinite;
+  -webkit-animation: roundtime calc(var(--duration) * 1s) steps(var(--duration)) forwards;
+          animation: roundtime calc(var(--duration) * 1s) steps(var(--duration)) forwards;
+  -webkit-transform-origin: left center;
+          transform-origin: left center;
+}
+
+.round-time-bar[data-style="smooth"] div {
+  -webkit-animation: roundtime calc(var(--duration) * 1s) linear forwards;
+          animation: roundtime calc(var(--duration) * 1s) linear forwards;
+}
+
+@-webkit-keyframes roundtime {
+  to {
+    -webkit-transform: scaleX(0);
+            transform: scaleX(0);
+  }
+}
+
+@keyframes roundtime {
+  to {
+    -webkit-transform: scaleX(0);
+            transform: scaleX(0);
+  }
 }
 
 @-webkit-keyframes gradient {
@@ -64,54 +114,6 @@
   }
   100% {
     background-position: 0% 50%;
-  }
-}
-
-.duration_one {
-  --duration: 12;
-}
-
-.duration_two {
-  --duration: 8;
-}
-
-.duration_three {
-  --duration: 5;
-}
-
-.round-time-bar {
-  margin: 1rem;
-  overflow: hidden;
-}
-
-.round-time-bar div {
-  height: 20px;
-  -webkit-animation: roundtime calc(var(--duration) * 1s) steps(var(--duration)) forwards;
-          animation: roundtime calc(var(--duration) * 1s) steps(var(--duration)) forwards;
-  -webkit-transform-origin: left center;
-          transform-origin: left center;
-  background: -webkit-gradient(linear, left top, left bottom, from(red), to(#900));
-  background: linear-gradient(to bottom, red, #900);
-}
-
-.round-time-bar[data-style="smooth"] div {
-  -webkit-animation: roundtime calc(var(--duration) * 1s) linear forwards;
-          animation: roundtime calc(var(--duration) * 1s) linear forwards;
-}
-
-@-webkit-keyframes roundtime {
-  to {
-    /* More performant than `width` */
-    -webkit-transform: scaleX(0);
-            transform: scaleX(0);
-  }
-}
-
-@keyframes roundtime {
-  to {
-    /* More performant than `width` */
-    -webkit-transform: scaleX(0);
-            transform: scaleX(0);
   }
 }
 /*# sourceMappingURL=Homepage.css.map */

@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import setCurrentQuestion from "../../redux/redux-actions/setCurrentQuestion";
 import classNames from "classnames";
 import "./Homepage.css";
 import Helpers from "../Helpers";
@@ -11,26 +13,34 @@ import network from "../../network";
 const baseUrl = "http://localhost:3001/api/questions/";
 
 export default function Homepage() {
-  const [question, setQuestion] = useState("");
+  const dispatch = useDispatch();
   const [quizStart, setQuizStart] = useState(false);
   const [choices, setChoices] = useState([]);
   const [questionType, setQuestionType] = useState("");
   const [difficulty, setDifficulty] = useState(3);
   const [showTimer, setShowTimer] = useState(false);
-  const [questionsAnswered, setQuestionsAnswered] = useState(0);
-  const [questionsFailed, setQuestionsFailed] = useState(0);
+  const { answered } = useSelector((state) => state);
+  const { failed } = useSelector((state) => state);
+  const { question } = useSelector((state) => state);
 
   const fetchQuestion = async () => {
     const { data } = await network.get(`${baseUrl}question`);
-    setQuestion(data.question);
+    setShowTimer(false);
+    dispatch(setCurrentQuestion(data.question));
     setChoices(data.choices);
     setQuestionType(data.type);
+    setShowTimer(true);
+  };
+  const handleDifficultyLevel = (questionsAnswered) => {
+    if (questionsAnswered > 7) {
+      setDifficulty(2);
+    } else if (questionsAnswered > 12) {
+      setDifficulty(3);
+    }
   };
 
   const handleQuizStart = async () => {
-    await fetchQuestion();
     setQuizStart(true);
-    setShowTimer(true);
   };
 
   const getTimerLength = (n) => {
@@ -40,20 +50,27 @@ export default function Homepage() {
       case 2:
         return 8700;
       case 3:
-        return 5800;
+        return 5500;
       default:
         return 12700;
     }
   };
 
   useEffect(() => {
-    const timer = setInterval(async () => {
+    handleDifficultyLevel(answered);
+  }, [setCurrentQuestion]);
+
+  useEffect(() => {
+    (async () => {
       await fetchQuestion();
-    }, getTimerLength(difficulty));
-    return () => {
-      clearInterval(timer);
-    };
-  }, []);
+      const timer = setInterval(async () => {
+        await fetchQuestion();
+      }, getTimerLength(difficulty));
+      return () => {
+        clearInterval(timer);
+      };
+    })();
+  }, [setCurrentQuestion]);
 
   return quizStart ? (
     <div className="homepage-top-container">
