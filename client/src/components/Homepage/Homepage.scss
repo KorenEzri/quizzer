@@ -36,7 +36,7 @@
   background: linear-gradient(-45deg, #692611, #553743, #a36969, #1d4b40);
   animation: gradient 4s ease infinite;
   background-size: 400% 400%;
-  color: rgb(179, 27, 27);
+  color: rgb(224, 224, 224);
   font-weight: bold;
   -webkit-animation-name: shake;
   animation-name: shake;
@@ -69,7 +69,6 @@
   padding: 6px;
   font-size: 0.5cm;
   border-radius: 8px;
-  z-index: 9001;
 }
 .bottom_boomer {
   width: 500px;
@@ -85,6 +84,20 @@
   animation-duration: 1s;
   -webkit-animation-fill-mode: both;
   animation-fill-mode: both;
+}
+.rating-div {
+  user-select: none;
+  margin-left: 42vw;
+  margin-top: 5vh;
+  padding: 1px;
+  margin-bottom: -5vh;
+  border-radius: 12px;
+  padding-left: 16px;
+  p {
+    padding-left: 19px;
+  }
+  background-color: whitesmoke;
+  width: 180px;
 }
 .duration_one {
   --duration: 12;

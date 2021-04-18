@@ -10,6 +10,7 @@ import Timer from "../Timer";
 import ChoiceBox from "../ChoiceBox";
 import BottomHUD from "../BottomHUD";
 import StartQuiz from "../StartQuiz";
+import RateLastQuestion from "../RateLastQuestion/";
 import Score from "../Scoreboard";
 import network from "../../network";
 const baseUrl = "http://localhost:3001/api/questions/";
@@ -93,6 +94,10 @@ export default function Homepage() {
 
   return quizStart ? (
     <div className="homepage-top-container">
+      <div className="rating-div">
+        <p>Rate this question?</p>
+        <RateLastQuestion />
+      </div>
       {question && (
         <div
           className={classNames({
