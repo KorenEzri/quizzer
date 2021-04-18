@@ -17,10 +17,10 @@ export default function Choice({ choice, isRight, index, handleQuizStart }) {
         const isCorrect = target.getAttribute("isright") === "true";
         if (isCorrect) {
           dispatch(setQuestionsAnswered(answered.answerCount));
-          await handleQuizStart("next", "didClick");
+          await handleQuizStart("next");
         } else {
           dispatch(setQuestionsFailed(failed.failedCount));
-          await handleQuizStart("next", "didClick");
+          await handleQuizStart("next");
         }
       }}
     >

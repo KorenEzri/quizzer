@@ -20,30 +20,33 @@ export default function Homepage() {
   const [choices, setChoices] = useState([]);
   const [questionType, setQuestionType] = useState("");
   const [difficulty, setDifficulty] = useState(1);
+  const [score, setScore] = useState(0);
   const [showTimer, setShowTimer] = useState(false);
   const [questionInterval, setQuestionInterval] = useState("");
-  const [score, setScore] = useState(0);
   const { answered } = useSelector((state) => state);
   const { failed } = useSelector((state) => state);
   const { question } = useSelector((state) => state);
 
-  const fetchQuestion = async () => {
+  const fetchQuestion = async (didClick) => {
     const { data } = await network.get(`${baseUrl}question`);
     setShowTimer(false);
     dispatch(setCurrentQuestion(data.question));
     setChoices(data.choices);
     setQuestionType(data.type);
     setShowTimer(true);
+    if (!didClick) {
+      dispatch(setQuestionsFailed(failed.failedCount));
+    }
     console.log(data.choices.rightChoice, difficulty);
   };
   const handleDifficultyLevel = (questionsAnswered) => {
-    if (questionsAnswered > 3) {
+    if (questionsAnswered > 2) {
       setDifficulty(2);
     }
-    if (questionsAnswered > 6) {
+    if (questionsAnswered > 5) {
       setDifficulty(3);
     }
-    if (questionsAnswered > 12) {
+    if (questionsAnswered > 11) {
       setDifficulty(4);
     }
   };
@@ -61,10 +64,10 @@ export default function Homepage() {
         return 12700;
     }
   };
-  const handleQuizStart = async (next, didClick) => {
+  const handleQuizStart = async (next) => {
     if (next) {
       clearInterval(questionInterval);
-      await fetchQuestion();
+      await fetchQuestion("didClick");
       setQuestionInterval(
         setInterval(async () => {
           await fetchQuestion();
@@ -72,13 +75,10 @@ export default function Homepage() {
       );
       return;
     }
-    await fetchQuestion();
+    await fetchQuestion("didClick");
     setQuizStart(true);
     setQuestionInterval(
       setInterval(async () => {
-        if (!didClick) {
-          dispatch(setQuestionsFailed(failed.failedCount));
-        }
         await fetchQuestion();
       }, getTimerLength(difficulty))
     );
