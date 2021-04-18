@@ -1,10 +1,105 @@
-.choiceBox-component {
+.choice__list {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  list-style-type: none;
+  width: 50vw;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.choice__list {
-  list-style-type: none;
+.choice__container {
+  cursor: pointer;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  -webkit-transition: 350ms;
+  transition: 350ms;
+  margin: 0.5cm;
+  margin-left: auto;
+  margin-right: auto;
+  width: 200px;
+  padding: 6px;
+  background: rgba(255, 255, 255, 0.329);
+  border-radius: 5px;
+  -webkit-animation: color-change 26s infinite;
+          animation: color-change 26s infinite;
+  font-weight: 600;
+}
+
+.choice__container:hover {
+  -webkit-transition: 350ms;
+  transition: 350ms;
+  padding: 12px;
+}
+
+.choice__container:active {
+  -webkit-transition: 2ms;
+  transition: 2ms;
+  background: rgba(255, 255, 255, 0.644);
+}
+
+.no__time {
+  -webkit-animation: color-change-notime 0.2s infinite;
+          animation: color-change-notime 0.2s infinite;
+}
+
+@-webkit-keyframes color-change {
+  0% {
+    color: black;
+  }
+  25% {
+    color: #410101;
+  }
+  50% {
+    color: #2b0202;
+  }
+  100% {
+    color: #0505a3;
+  }
+}
+
+@keyframes color-change {
+  0% {
+    color: black;
+  }
+  25% {
+    color: #410101;
+  }
+  50% {
+    color: #2b0202;
+  }
+  100% {
+    color: #0505a3;
+  }
+}
+
+@-webkit-keyframes color-change-notime {
+  0% {
+    color: red;
+  }
+  50% {
+    color: blue;
+  }
+  100% {
+    color: red;
+  }
+}
+
+@keyframes color-change-notime {
+  0% {
+    color: red;
+  }
+  50% {
+    color: blue;
+  }
+  100% {
+    color: red;
+  }
 }
 /*# sourceMappingURL=ChoiceBox.css.map */

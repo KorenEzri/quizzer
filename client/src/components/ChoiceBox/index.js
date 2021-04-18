@@ -19,7 +19,6 @@ const shuffleChoices = (array) => {
 export default function ChoiceBox({ choices, questionType }) {
   const { rightChoice, falsies } = choices;
   if (!falsies) return null;
-
   const allChoices = Array.from(
     new Set(
       shuffleChoices(
@@ -39,28 +38,34 @@ export default function ChoiceBox({ choices, questionType }) {
           allChoices.map((choice, index) => {
             let anyChoice = choice[questionType] || choice;
             return (
-              <Choice
-                key={`choice-${index}`}
-                choice={anyChoice}
-                isRight={
-                  anyChoice === rightChoice[questionType] ||
-                  anyChoice === rightChoice
-                }
-              />
+              <div className="choice__container">
+                <Choice
+                  choice={anyChoice}
+                  isRight={
+                    anyChoice === rightChoice[questionType] ||
+                    anyChoice === rightChoice
+                  }
+                  index={index + 1}
+                />
+              </div>
             );
           })
         ) : (
           <div className="truefalse_div-choiceBox-component">
-            <Choice
-              key={"true"}
-              choice={allChoices[0].country}
-              isRight={allChoices[0].country === rightChoice.country}
-            />
-            <Choice
-              key={"false"}
-              choice={allChoices[1].country}
-              isRight={allChoices[1].country === rightChoice.country}
-            />
+            <div className="choice__container">
+              <Choice
+                key={"true"}
+                choice={allChoices[0].country}
+                isRight={allChoices[0].country === rightChoice.country}
+              />
+            </div>
+            <div className="choice__container">
+              <Choice
+                key={"false"}
+                choice={allChoices[1].country}
+                isRight={allChoices[1].country === rightChoice.country}
+              />
+            </div>
           </div>
         )}
       </ul>

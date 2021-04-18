@@ -1,4 +1,117 @@
 .helper {
   color: darkblue;
+  margin: 30px;
+  font-size: 1cm !important;
+  cursor: pointer;
+}
+
+.helper:hover {
+  color: #025e7c;
+}
+
+.giveup_helper:hover {
+  color: darkred !important;
+}
+
+.game__container {
+  position: relative;
+  text-align: center;
+  width: 70vw;
+  height: 45vh;
+  min-height: 380px;
+  margin-left: auto;
+  margin-right: auto;
+  background: linear-gradient(-45deg, #ee7752, #ee2270, #23a6d5, #23d5ab);
+  background-size: 400% 400%;
+  -webkit-animation: gradient 25s ease infinite;
+          animation: gradient 25s ease infinite;
+}
+
+.question__container {
+  position: relative;
+}
+
+.helpers-container {
+  -webkit-transition: 300ms;
+  transition: 300ms;
+  position: absolute;
+  margin-right: 80%;
+}
+
+.question {
+  font-size: 26px;
+  padding-top: 30px;
+}
+
+@-webkit-keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.duration_one {
+  --duration: 12;
+}
+
+.duration_two {
+  --duration: 8;
+}
+
+.duration_three {
+  --duration: 5;
+}
+
+.round-time-bar {
+  margin: 1rem;
+  overflow: hidden;
+}
+
+.round-time-bar div {
+  height: 20px;
+  -webkit-animation: roundtime calc(var(--duration) * 1s) steps(var(--duration)) forwards;
+          animation: roundtime calc(var(--duration) * 1s) steps(var(--duration)) forwards;
+  -webkit-transform-origin: left center;
+          transform-origin: left center;
+  background: -webkit-gradient(linear, left top, left bottom, from(red), to(#900));
+  background: linear-gradient(to bottom, red, #900);
+}
+
+.round-time-bar[data-style="smooth"] div {
+  -webkit-animation: roundtime calc(var(--duration) * 1s) linear forwards;
+          animation: roundtime calc(var(--duration) * 1s) linear forwards;
+}
+
+@-webkit-keyframes roundtime {
+  to {
+    /* More performant than `width` */
+    -webkit-transform: scaleX(0);
+            transform: scaleX(0);
+  }
+}
+
+@keyframes roundtime {
+  to {
+    /* More performant than `width` */
+    -webkit-transform: scaleX(0);
+            transform: scaleX(0);
+  }
 }
 /*# sourceMappingURL=Homepage.css.map */

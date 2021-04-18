@@ -1,8 +1,61 @@
-.choiceBox-component {
-  display: flex;
-}
 .choice__list {
+  display: flex;
+  flex-direction: column;
   list-style-type: none;
+  width: 50vw;
+  margin-left: auto;
+  margin-right: auto;
 }
-.choicebox__choice {
+.choice__container {
+  cursor: pointer;
+  user-select: none;
+  transition: 350ms;
+  margin: 0.5cm;
+  margin-left: auto;
+  margin-right: auto;
+  width: 200px;
+  padding: 6px;
+  background: rgba(255, 255, 255, 0.329);
+  border-radius: 5px;
+  animation: color-change 26s infinite;
+  font-weight: 600;
+}
+.choice__container:hover {
+  transition: 350ms;
+  padding: 12px;
+}
+.choice__container:active {
+  transition: 2ms;
+  background: rgba(255, 255, 255, 0.644);
+}
+.no__time {
+  animation: color-change-notime 0.2s infinite;
+}
+.choice__number {
+}
+@keyframes color-change {
+  0% {
+    color: black;
+  }
+  25% {
+    color: rgb(65, 1, 1);
+  }
+  50% {
+    color: rgb(43, 2, 2);
+  }
+  100% {
+    color: rgb(5, 5, 163);
+  }
+}
+
+@keyframes color-change-notime {
+  0% {
+    color: red;
+  }
+  50% {
+    color: blue;
+  }
+  100% {
+    color: red;
+  }
 }
