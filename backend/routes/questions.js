@@ -8,7 +8,7 @@ questions.get("/question", async (req, res) => {
     res.status(200).send(await network.generateRandomQuestion());
   } catch ({ message }) {
     try {
-      console.log(message);
+      console.log("Error, retrying..", message);
       res.status(200).send(await network.generateRandomQuestion());
     } catch ({ message }) {
       console.log(message);

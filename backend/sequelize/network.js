@@ -4,6 +4,7 @@ const Population = require("../sequelize/models/Population"); // POPULATION COUN
 const IndependeceDays = require("../sequelize/models/IndependenceDays"); // SELF EXPLANATORY
 const CountryList = require("../sequelize/models/CountryList"); // SIMPLE LIST OF COUNTRIES THAT WORKS ACROSS ALL DATASETS
 const Capitals = require("../sequelize/models/Capitals");
+const { Sequelize } = require("sequelize");
 
 /////////////////////////////////////
 //  !!!!!!!     FLOW:     !!!!!!!
@@ -11,7 +12,7 @@ const Capitals = require("../sequelize/models/Capitals");
 // FUNC generateRandomQuestion() => gets random question template and random country names
 const generateRandomQuestion = async () => {
   const allCountries = await CountryList.findAll({
-    attributes: ["Country"],
+    attributes: [Sequelize.fn("DISTINCT", Sequelize.col("Country")), "Country"],
   });
   const templates = await Template.findAll();
   const randomTemplate = getRandomElements(templates, 1);
@@ -67,6 +68,7 @@ const getRelevantQuestionParams = async (reqs, template, list, ans_type) => {
   );
   return {
     question: question,
+    type: determineQuestionType(reqs, ans_type),
     choices: questionChoices,
   };
 };
@@ -99,62 +101,77 @@ const getPopulationQCs = async (countries) => {
   const popsByCountries = await Promise.all(
     countries.map(async ({ Country }) => {
       const popCount = await Population.findAll({
-        attributes: ["Population"],
+        attributes: [
+          Sequelize.fn("DISTINCT", Sequelize.col("Population")),
+          "Population",
+        ],
         where: {
           Country: `${Country.trim()}`,
         },
       });
       return {
         country: Country.trim(),
-        population: popCount[0].dataValues.Population,
+        data: popCount[0].dataValues.Population,
       };
     })
   );
-  return generateNumericChoices(popsByCountries, "population");
+  return generateNumericChoices(popsByCountries);
 };
 const getSizeQCs = async (countries) => {
   const countrySizeInSqKm = await Promise.all(
     countries.map(async ({ Country }) => {
       const CountrySize = await Countries.findAll({
-        attributes: ["Area_sq_mi"],
+        attributes: [
+          Sequelize.fn("DISTINCT", Sequelize.col("Area_sq_mi")),
+          "Area_sq_mi",
+        ],
         where: {
           Country: `${Country.trim()}`,
         },
       });
       return {
         country: Country.trim(),
-        size: CountrySize[0].dataValues.Area_sq_mi,
+        data: CountrySize[0].dataValues.Area_sq_mi,
       };
     })
   );
-  return generateNumericChoices(countrySizeInSqKm, "size");
+  return generateNumericChoices(countrySizeInSqKm);
 };
 const getRateQCs = async (countries, birthOrDeath) => {
-  const { Country } = countries[0];
-  const birthOrDeathRate = await Countries.findAll({
-    attributes: [`${birthOrDeath}`],
-    where: {
-      Country: `${Country.trim()}`,
-    },
-  });
-  const rate = {
-    country: Country,
-    rate: birthOrDeathRate[0].dataValues[birthOrDeath],
-  };
-  return generateNumericChoices([rate], "rate");
+  const ratesByCountry = await Promise.all(
+    countries.map(async ({ Country }) => {
+      const birthOrDeathRate = await Countries.findAll({
+        attributes: [
+          Sequelize.fn("DISTINCT", Sequelize.col(`${birthOrDeath}`)),
+          `${birthOrDeath}`,
+        ],
+        where: {
+          Country: `${Country.trim()}`,
+        },
+      });
+      return {
+        country: Country.trim(),
+        data: birthOrDeathRate[0].dataValues[birthOrDeath],
+      };
+    })
+  );
+  return generateNumericChoices(ratesByCountry);
 };
 const getAut_DateQCs = async (countries) => {
   const independenceDaysByCountry = await Promise.all(
     countries.map(async ({ Country }) => {
       const independeceDays = await IndependeceDays.findAll({
-        attributes: ["Year_celebrated"],
+        attributes: [
+          Sequelize.fn("DISTINCT", Sequelize.col("Year_celebrated")),
+          "Year_celebrated",
+        ],
         where: {
           Country: ` ${Country.trim()}`,
         },
       });
       return {
         country: Country.trim(),
-        autonomyDate: independeceDays[0].dataValues.Year_celebrated,
+        data: independeceDays[0].dataValues.Year_celebrated,
       };
     })
   );
@@ -164,14 +181,17 @@ const getCapitalQCs = async (countries) => {
   const capitalsByCountry = await Promise.all(
     countries.map(async ({ Country }) => {
       const capitals = await Capitals.findAll({
-        attributes: ["CapitalName"],
+        attributes: [
+          Sequelize.fn("DISTINCT", Sequelize.col("CapitalName")),
+          "CapitalName",
+        ],
         where: {
           Country: `${Country.trim()}`,
         },
       });
       return {
         country: Country.trim(),
-        capital: capitals[0].dataValues.CapitalName,
+        data: capitals[0].dataValues.CapitalName,
       };
     })
   );
@@ -181,7 +201,10 @@ const getRegionalQCs = async (countries) => {
   const regionsByCountry = await Promise.all(
     countries.map(async ({ Country }) => {
       const regions = await Countries.findAll({
-        attributes: ["Region"],
+        attributes: [
+          Sequelize.fn("DISTINCT", Sequelize.col("Region")),
+          "Region",
+        ],
         where: {
           Country: `${Country.trim()}`,
         },
@@ -190,7 +213,7 @@ const getRegionalQCs = async (countries) => {
       const lower = region_name.toLowerCase();
       return {
         country: Country.trim(),
-        capital: region_name.charAt(0).toUpperCase() + lower.slice(1).trim(),
+        data: region_name.charAt(0).toUpperCase() + lower.slice(1).trim(),
       };
     })
   );
@@ -200,14 +223,17 @@ const getContinentQCs = async (countries) => {
   const continentsByCountry = await Promise.all(
     countries.map(async ({ Country }) => {
       const continents = await Capitals.findAll({
-        attributes: ["ContinentName"],
+        attributes: [
+          Sequelize.fn("DISTINCT", Sequelize.col("ContinentName")),
+          "ContinentName",
+        ],
         where: {
           Country: `${Country.trim()}`,
         },
       });
       return {
         country: Country.trim(),
-        capital: continents[0].dataValues.ContinentName,
+        data: continents[0].dataValues.ContinentName,
       };
     })
   );
@@ -216,27 +242,27 @@ const getContinentQCs = async (countries) => {
 // DATA-GETTERS END
 // FUNC generateNumericChoices() || generateTextualChoices() => accepts array of answers,
 // gets the correct answer from array
-const generateNumericChoices = (numByCountries, type) => {
+const generateNumericChoices = (numByCountries) => {
   let falsies;
   let rightChoice;
   if (numByCountries.length > 1) {
     let choiceValues = numByCountries.map((choice) => {
-      return choice[type];
+      return choice.data;
     });
     rightChoice = numByCountries.find((choice) => {
-      return choice[type] === Math.max(...choiceValues);
+      return choice.data === Math.max(...choiceValues);
     });
     numByCountries.splice(
       numByCountries.findIndex((choice) => {
-        return choice[type] === rightChoice[type];
+        return choice.data === rightChoice.data;
       }),
       1
     );
     numByCountries[0].size
-      ? (falsies = getChoicesRelativeToNumber(numByCountries[0].size))
+      ? (falsies = getChoicesRelativeToNumber(numByCountries[0].data))
       : (falsies = numByCountries);
   } else {
-    rightChoice = numByCountries[0][type];
+    rightChoice = numByCountries[0].data;
     falsies = getChoicesRelativeToNumber(rightChoice);
   }
   return {
@@ -247,8 +273,8 @@ const generateNumericChoices = (numByCountries, type) => {
 const generateTextualChoices = (stringsByCountries) => {
   let falsies;
   let rightChoice;
-  if (stringsByCountries[0].capital) {
-    rightChoice = stringsByCountries[0].capital;
+  if (!Number(stringsByCountries[0].data)) {
+    rightChoice = stringsByCountries[0].data;
     stringsByCountries.splice(0, 1);
     falsies = stringsByCountries;
     return {
@@ -257,14 +283,14 @@ const generateTextualChoices = (stringsByCountries) => {
     };
   }
   let choiceValues = stringsByCountries.map((choice) => {
-    return Number(choice.autonomyDate);
+    return Number(choice.data);
   });
   rightChoice = stringsByCountries.find((choice) => {
-    return Number(choice.autonomyDate) === Math.min(...choiceValues);
+    return Number(choice.data) === Math.min(...choiceValues);
   });
   stringsByCountries.splice(
     stringsByCountries.findIndex((choice) => {
-      return Number(choice.autonomyDate) === Number(rightChoice.autonomyDate);
+      return Number(choice.data) === Number(rightChoice.data);
     }),
     1
   );
@@ -293,5 +319,17 @@ const getRandomElements = (array, n) => {
   }
   return results;
 };
-
+// FUNC determineQuestionType() receives question requirements and answer type
+// and determines then returns the type of answer to offer the user.
+const determineQuestionType = (reqs, ans_type) => {
+  const type = `${reqs}${ans_type}`;
+  if (reqs === "XY") {
+    return "truefalse";
+  }
+  if (type === "listaut_date" || "listdeathrate" || "listpop_count") {
+    return "country";
+  } else {
+    return "data";
+  }
+};
 module.exports = { generateRandomQuestion };

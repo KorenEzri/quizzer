@@ -7,22 +7,23 @@ import ChoiceBox from "../ChoiceBox";
 import BottomHUD from "../BottomHUD";
 import StartQuiz from "../StartQuiz";
 import network from "../../network";
-
 const baseUrl = "http://localhost:3001/api/questions/";
+
 export default function Homepage() {
   const [question, setQuestion] = useState("");
   const [quizStart, setQuizStart] = useState(false);
   const [choices, setChoices] = useState([]);
+  const [questionType, setQuestionType] = useState("");
 
   const fetchQuestion = async () => {
     const { data } = await network.get(`${baseUrl}question`);
     setQuestion(data.question);
     setChoices(data.choices);
+    setQuestionType(data.type);
   };
-
-  const handleQuizStart = () => {
+  const handleQuizStart = async () => {
+    await fetchQuestion();
     setQuizStart(true);
-    fetchQuestion();
   };
 
   return quizStart ? (
@@ -33,15 +34,19 @@ export default function Homepage() {
       <div className="question-container">
         <Question question={question} />
       </div>
-      <div className="timer-container">
-        <Timer />
-      </div>
-      <div className="choicebox-container">
-        <ChoiceBox choices={choices} />
-      </div>
-      <div className="bottomHUD-container">
-        <BottomHUD />
-      </div>
+      {question && (
+        <div className="game_started">
+          <div className="timer-container">
+            <Timer />
+          </div>
+          <div className="choicebox-container">
+            <ChoiceBox choices={choices} questionType={questionType} />
+          </div>
+          <div className="bottomHUD-container">
+            <BottomHUD />
+          </div>
+        </div>
+      )}
     </div>
   ) : (
     <StartQuiz handleQuizStart={handleQuizStart} />
