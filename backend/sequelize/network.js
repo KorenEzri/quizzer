@@ -3,11 +3,11 @@ const Countries = require("../sequelize/models/Countries"); // COUNTRY DATA - RA
 const Population = require("../sequelize/models/Population"); // POPULATION COUNTS FOR COUNTRIES
 const IndependeceDays = require("../sequelize/models/IndependenceDays"); // SELF EXPLANATORY
 const CountryList = require("../sequelize/models/CountryList"); // SIMPLE LIST OF COUNTRIES THAT WORKS ACROSS ALL DATASETS
+const Capitals = require("../sequelize/models/Capitals");
 
 /////////////////////////////////////
 //  !!!!!!!     FLOW:     !!!!!!!
 /////////////////////////////////////
-
 // FUNC generateRandomQuestion() => gets random question template and random country names
 const generateRandomQuestion = async () => {
   const allCountries = await CountryList.findAll({
@@ -49,6 +49,13 @@ const getRelevantQuestionParams = async (reqs, template, list, ans_type) => {
         relevantCountries[0].Country.trim()
       )}?`;
       break;
+    case "Xlist":
+      relevantCountries = getRandomElements(list, 4);
+      question = `${template.replace(
+        /X/g,
+        relevantCountries[0].Country.trim()
+      )}?`;
+      break;
     default:
       relevantCountries = getRandomElements(list, 1);
       question = `${template}${relevantCountries[0].Country.trim()}?`;
@@ -77,11 +84,17 @@ const getRelevantQuestionChoices = async (ans_type, countries) => {
       return await getRateQCs(countries, "Birthrate");
     case "deathrate":
       return await getRateQCs(countries, "Deathrate");
+    case "capital":
+      console.log(
+        "|||||||||||||||||||||||||||||||||||||||||||||||||||||||||!!!!!!!!!!!!!!!!!!!!!IS TYPE: ",
+        ans_type,
+        "!!!!!!!!!!!!!!!!!!!!!!!"
+      );
+      return await getCapitalQCs(countries);
     default:
       break;
   }
 };
-
 // calls DATA-GETTERS: FOR QUESTION CHOICES
 const getPopulationQCs = async (countries) => {
   const popsByCountries = await Promise.all(
@@ -146,10 +159,26 @@ const getAut_DateQCs = async (countries) => {
       };
     })
   );
-  return generateDateChoices(independenceDaysByCountry);
+  return generateTextualChoices(independenceDaysByCountry);
+};
+const getCapitalQCs = async (countries) => {
+  const capitalsByCountry = await Promise.all(
+    countries.map(async ({ Country }) => {
+      const capitals = await Capitals.findAll({
+        attributes: ["CapitalName"],
+        where: {
+          Country: `${Country.trim()}`,
+        },
+      });
+      return {
+        country: Country.trim(),
+        capital: capitals[0].dataValues.CapitalName,
+      };
+    })
+  );
+  return generateTextualChoices(capitalsByCountry);
 };
 // DATA-GETTERS END
-
 // FUNC generateNumericChoices() || generateDateChoices() => accepts array of answers,
 // gets the correct answer from array
 const generateNumericChoices = (numByCountries, type) => {
@@ -180,22 +209,31 @@ const generateNumericChoices = (numByCountries, type) => {
     falsies,
   };
 };
-const generateDateChoices = (datesByCountries) => {
+const generateTextualChoices = (stringsByCountries) => {
   let falsies;
   let rightChoice;
-  let choiceValues = datesByCountries.map((choice) => {
+  if (stringsByCountries[0].capital) {
+    rightChoice = stringsByCountries[0].capital;
+    stringsByCountries.splice(0, 1);
+    falsies = stringsByCountries;
+    return {
+      rightChoice,
+      falsies,
+    };
+  }
+  let choiceValues = stringsByCountries.map((choice) => {
     return Number(choice.autonomyDate);
   });
-  rightChoice = datesByCountries.find((choice) => {
+  rightChoice = stringsByCountries.find((choice) => {
     return Number(choice.autonomyDate) === Math.min(...choiceValues);
   });
-  datesByCountries.splice(
-    datesByCountries.findIndex((choice) => {
+  stringsByCountries.splice(
+    stringsByCountries.findIndex((choice) => {
       return Number(choice.autonomyDate) === Number(rightChoice.autonomyDate);
     }),
     1
   );
-  falsies = datesByCountries;
+  falsies = stringsByCountries;
   return {
     rightChoice,
     falsies,
