@@ -11,6 +11,7 @@ import ChoiceBox from "../ChoiceBox";
 import BottomHUD from "../BottomHUD";
 import StartQuiz from "../StartQuiz";
 import Score from "../Scoreboard";
+import RateLastQuestion from "../RateLastQuestion";
 import network from "../../network";
 const baseUrl = "http://localhost:3001/api/questions/";
 
@@ -37,7 +38,7 @@ export default function Homepage() {
     if (!didClick) {
       dispatch(setQuestionsFailed(failed.failedCount));
     }
-    console.log(data.choices.rightChoice, difficulty);
+    console.log(data.choices.rightChoice);
   };
   const handleDifficultyLevel = (questionsAnswered) => {
     if (questionsAnswered > 2) {
@@ -94,9 +95,18 @@ export default function Homepage() {
   return quizStart ? (
     <div className="homepage-top-container">
       {question && (
-        <div className="game__container">
+        <div
+          className={classNames({
+            game__container: true,
+            mid: difficulty === 3,
+            hard: difficulty === 4,
+          })}
+        >
           <div className="question__container">
             <Question question={question} />
+            <div className="scoreboard-container">
+              <Score playerScore={score} />
+            </div>
           </div>
           <div
             className={classNames({
@@ -116,15 +126,15 @@ export default function Homepage() {
             <ChoiceBox
               choices={choices}
               questionType={questionType}
+              difficulty={difficulty}
               handleQuizStart={handleQuizStart}
             />
           </div>
-          <div className="bottomHUD-container">
-            <BottomHUD />
-          </div>
-          <div className="scoreboard-container">
-            <Score playerScore={score} />
-          </div>
+          {difficulty > 3 && (
+            <div className="bottomHUD-container">
+              <BottomHUD />
+            </div>
+          )}
         </div>
       )}
     </div>

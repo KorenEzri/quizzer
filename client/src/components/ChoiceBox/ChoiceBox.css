@@ -30,12 +30,13 @@
   -webkit-animation: color-change 26s infinite;
           animation: color-change 26s infinite;
   font-weight: 600;
+  font-size: 0.5cm;
 }
 
 .choice__container:hover {
   -webkit-transition: 350ms;
   transition: 350ms;
-  padding: 12px;
+  padding: 9px;
 }
 
 .choice__container:active {

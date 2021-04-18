@@ -1,10 +1,40 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import setQuestionsAnswered from "../../../redux/redux-actions/setQuestionsAnswered";
 import setQuestionsFailed from "../../../redux/redux-actions/setQuestionsFailed";
-import setCurrentQuestion from "../../../redux/redux-actions/setCurrentQuestion";
+import ansEasy from "../../../redux/redux-actions/answers/ansEasy";
+import ansMid from "../../../redux/redux-actions/answers/ansMid";
+import ansHard from "../../../redux/redux-actions/answers/ansHard";
+import failHard from "../../../redux/redux-actions/fails/failHard";
 
-export default function Choice({ choice, isRight, index, handleQuizStart }) {
+export default function Choice({
+  choice,
+  isRight,
+  index,
+  handleQuizStart,
+  difficulty,
+}) {
+  let pointsToIncrement;
+  let pointsToDecrement;
+  switch (difficulty) {
+    case 1:
+      pointsToIncrement = ansEasy;
+      pointsToDecrement = setQuestionsFailed;
+      break;
+    case 2:
+      pointsToIncrement = ansEasy;
+      pointsToDecrement = setQuestionsFailed;
+      break;
+    case 3:
+      pointsToIncrement = ansMid;
+      pointsToDecrement = failHard;
+      break;
+    case 4:
+      pointsToDecrement = failHard;
+      pointsToIncrement = ansHard;
+      break;
+    default:
+      break;
+  }
   let { answered } = useSelector((state) => state);
   let { failed } = useSelector((state) => state);
   const dispatch = useDispatch();
@@ -16,10 +46,10 @@ export default function Choice({ choice, isRight, index, handleQuizStart }) {
       onClick={async ({ target }) => {
         const isCorrect = target.getAttribute("isright") === "true";
         if (isCorrect) {
-          dispatch(setQuestionsAnswered(answered.answerCount));
+          dispatch(pointsToIncrement(answered.answerCount));
           await handleQuizStart("next");
         } else {
-          dispatch(setQuestionsFailed(failed.failedCount));
+          dispatch(pointsToDecrement(failed.failedCount));
           await handleQuizStart("next");
         }
       }}

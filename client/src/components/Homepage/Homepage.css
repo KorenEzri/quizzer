@@ -14,17 +14,47 @@
 }
 
 .game__container {
+  margin-top: 10vh;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
   position: relative;
   text-align: center;
   width: 70vw;
   height: 65vh;
-  min-height: 380px;
+  min-height: 550px;
   margin-left: auto;
   margin-right: auto;
   background: linear-gradient(-45deg, #ee7752, #ee2270, #23a6d5, #23d5ab);
   -webkit-animation: gradient 25s ease infinite;
           animation: gradient 25s ease infinite;
   background-size: 400% 400%;
+  -webkit-box-shadow: 5px 5px 15px 5px #000000c5;
+  box-shadow: 5px 5px 15px 5px #000000cc;
+}
+
+.mid {
+  background: linear-gradient(-45deg, #8a3b23, #9e1e4f, #1e6179, #1e7460);
+  -webkit-animation: gradient 15s ease infinite;
+          animation: gradient 15s ease infinite;
+  background-size: 400% 400%;
+  color: black;
+}
+
+.hard {
+  background: linear-gradient(-45deg, #692611, #553743, #a36969, #1d4b40);
+  -webkit-animation: gradient 4s ease infinite;
+          animation: gradient 4s ease infinite;
+  background-size: 400% 400%;
+  color: #b31b1b;
+  font-weight: bold;
+  -webkit-animation-name: shake;
+  animation-name: shake;
+  -webkit-animation-duration: 1s;
+  animation-duration: 1s;
+  -webkit-animation-fill-mode: both;
+  animation-fill-mode: both;
 }
 
 .question__container {
@@ -39,8 +69,43 @@
 }
 
 .question {
-  font-size: 26px;
+  font-size: 0.6cm;
   padding-top: 30px;
+}
+
+.scoreboard-container {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  background-color: rgba(226, 226, 245, 0.651);
+  width: 100px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  position: absolute;
+  margin-top: 360px;
+  margin-left: 46.4%;
+  padding: 6px;
+  font-size: 0.5cm;
+  border-radius: 8px;
+  z-index: 9001;
+}
+
+.bottom_boomer {
+  width: 500px;
+  position: absolute;
+  margin-left: -20vw;
+  -webkit-box-shadow: -5px -3px 15px 5px #3f0606;
+  box-shadow: -5px -3px 15px 5px #580505;
+  margin-top: -10px;
+  -webkit-transform: skewY(-10deg);
+          transform: skewY(-10deg);
+  -webkit-animation-name: tada;
+  animation-name: tada;
+  -webkit-animation-duration: 1s;
+  animation-duration: 1s;
+  -webkit-animation-fill-mode: both;
+  animation-fill-mode: both;
 }
 
 .duration_one {
@@ -118,6 +183,110 @@
   }
   100% {
     background-position: 0% 50%;
+  }
+}
+
+@-webkit-keyframes tada {
+  0% {
+    -webkit-transform: scale3d(1, 1, 1);
+    transform: scale3d(1, 1, 1);
+  }
+  10%,
+  20% {
+    -webkit-transform: scale3d(0.9, 0.9, 0.9) rotate3d(0, 0, 1, -3deg);
+    transform: scale3d(0.9, 0.9, 0.9) rotate3d(0, 0, 1, -3deg);
+  }
+  30%,
+  50%,
+  70%,
+  90% {
+    -webkit-transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, 3deg);
+    transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, 3deg);
+  }
+  40%,
+  60%,
+  80% {
+    -webkit-transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, -3deg);
+    transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, -3deg);
+  }
+  100% {
+    -webkit-transform: scale3d(1, 1, 1);
+    transform: scale3d(1, 1, 1);
+  }
+}
+
+@keyframes tada {
+  0% {
+    -webkit-transform: scale3d(1, 1, 1);
+    transform: scale3d(1, 1, 1);
+  }
+  10%,
+  20% {
+    -webkit-transform: scale3d(0.9, 0.9, 0.9) rotate3d(0, 0, 1, -3deg);
+    transform: scale3d(0.9, 0.9, 0.9) rotate3d(0, 0, 1, -3deg);
+  }
+  30%,
+  50%,
+  70%,
+  90% {
+    -webkit-transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, 3deg);
+    transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, 3deg);
+  }
+  40%,
+  60%,
+  80% {
+    -webkit-transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, -3deg);
+    transform: scale3d(1.1, 1.1, 1.1) rotate3d(0, 0, 1, -3deg);
+  }
+  100% {
+    -webkit-transform: scale3d(1, 1, 1);
+    transform: scale3d(1, 1, 1);
+  }
+}
+
+@-webkit-keyframes shake {
+  0%,
+  100% {
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    -webkit-transform: translate3d(-10px, 0, 0);
+    transform: translate3d(-10px, 0, 0);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    -webkit-transform: translate3d(10px, 0, 0);
+    transform: translate3d(10px, 0, 0);
+  }
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    -webkit-transform: translate3d(-10px, 0, 0);
+    transform: translate3d(-10px, 0, 0);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    -webkit-transform: translate3d(10px, 0, 0);
+    transform: translate3d(10px, 0, 0);
   }
 }
 /*# sourceMappingURL=Homepage.css.map */

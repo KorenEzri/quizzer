@@ -1,5 +1,5 @@
 import React from "react";
 
 export default function Score({ playerScore }) {
-  return <div>{playerScore}</div>;
+  return <div className="score__component">Score: {playerScore}</div>;
 }

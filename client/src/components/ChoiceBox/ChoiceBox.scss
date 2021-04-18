@@ -19,10 +19,11 @@
   border-radius: 5px;
   animation: color-change 26s infinite;
   font-weight: 600;
+  font-size: 0.5cm;
 }
 .choice__container:hover {
   transition: 350ms;
-  padding: 12px;
+  padding: 9px;
 }
 .choice__container:active {
   transition: 2ms;
@@ -30,8 +31,6 @@
 }
 .no__time {
   animation: color-change-notime 0.2s infinite;
-}
-.choice__number {
 }
 @keyframes color-change {
   0% {
@@ -47,7 +46,6 @@
     color: rgb(5, 5, 163);
   }
 }
-
 @keyframes color-change-notime {
   0% {
     color: red;
