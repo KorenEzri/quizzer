@@ -85,12 +85,11 @@ const getRelevantQuestionChoices = async (ans_type, countries) => {
     case "deathrate":
       return await getRateQCs(countries, "Deathrate");
     case "capital":
-      console.log(
-        "|||||||||||||||||||||||||||||||||||||||||||||||||||||||||!!!!!!!!!!!!!!!!!!!!!IS TYPE: ",
-        ans_type,
-        "!!!!!!!!!!!!!!!!!!!!!!!"
-      );
       return await getCapitalQCs(countries);
+    case "region":
+      return await getRegionalQCs(countries);
+    case "continent":
+      return await getContinentQCs(countries);
     default:
       break;
   }
@@ -178,8 +177,44 @@ const getCapitalQCs = async (countries) => {
   );
   return generateTextualChoices(capitalsByCountry);
 };
+const getRegionalQCs = async (countries) => {
+  const regionsByCountry = await Promise.all(
+    countries.map(async ({ Country }) => {
+      const regions = await Countries.findAll({
+        attributes: ["Region"],
+        where: {
+          Country: `${Country.trim()}`,
+        },
+      });
+      const region_name = regions[0].dataValues.Region;
+      const lower = region_name.toLowerCase();
+      return {
+        country: Country.trim(),
+        capital: region_name.charAt(0).toUpperCase() + lower.slice(1).trim(),
+      };
+    })
+  );
+  return generateTextualChoices(regionsByCountry);
+};
+const getContinentQCs = async (countries) => {
+  const continentsByCountry = await Promise.all(
+    countries.map(async ({ Country }) => {
+      const continents = await Capitals.findAll({
+        attributes: ["ContinentName"],
+        where: {
+          Country: `${Country.trim()}`,
+        },
+      });
+      return {
+        country: Country.trim(),
+        capital: continents[0].dataValues.ContinentName,
+      };
+    })
+  );
+  return generateTextualChoices(continentsByCountry);
+};
 // DATA-GETTERS END
-// FUNC generateNumericChoices() || generateDateChoices() => accepts array of answers,
+// FUNC generateNumericChoices() || generateTextualChoices() => accepts array of answers,
 // gets the correct answer from array
 const generateNumericChoices = (numByCountries, type) => {
   let falsies;
