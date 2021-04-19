@@ -1,4 +1,5 @@
 import React from "react";
+import { useSelector } from "react-redux";
 import Choice from "./Choice";
 import "./ChoiceBox.css";
 
@@ -17,13 +18,14 @@ const shuffleChoices = (array) => {
 };
 
 export default function ChoiceBox({
-  choices,
   questionType,
   handleQuizStart,
   difficulty,
 }) {
+  const { choices } = useSelector((state) => state);
   const { rightChoice, falsies } = choices;
   if (!falsies) return null;
+
   const allChoices = Array.from(
     new Set(
       shuffleChoices(

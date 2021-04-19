@@ -12,6 +12,18 @@ export default function Choice({
   handleQuizStart,
   difficulty,
 }) {
+  const addCommas = (nStr) => {
+    nStr += "";
+    var x = nStr.split(".");
+    var x1 = x[0];
+    var x2 = x.length > 1 ? "." + x[1] : "";
+    var rgx = /(\d+)(\d{3})/;
+    while (rgx.test(x1)) {
+      x1 = x1.replace(rgx, "$1" + "," + "$2");
+    }
+    return x1 + x2;
+  };
+
   let pointsToIncrement;
   let pointsToDecrement;
   switch (difficulty) {
@@ -53,7 +65,7 @@ export default function Choice({
         }
       }}
     >
-      {choice}
+      {Number(choice) ? addCommas(choice) : choice}
     </li>
   );
 }

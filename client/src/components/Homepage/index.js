@@ -20,22 +20,18 @@ const player = localStorage.getItem("anon") || localStorage.getItem("user");
 export default function Homepage() {
   const dispatch = useDispatch();
   const [quizStart, setQuizStart] = useState(false);
-  const [choices, setChoices] = useState([]);
   const [questionType, setQuestionType] = useState("");
   const [difficulty, setDifficulty] = useState(1);
   const [score, setScore] = useState(0);
   const [showTimer, setShowTimer] = useState(false);
   const [questionInterval, setQuestionInterval] = useState("");
-  const { answered } = useSelector((state) => state);
-  const { failed } = useSelector((state) => state);
-  const { question } = useSelector((state) => state);
+  const { answered, failed, question } = useSelector((state) => state);
 
   const fetchQuestion = async (didClick) => {
     const { data } = await network.get(`${baseUrl}question`);
     setShowTimer(false);
     dispatch(setCurrentQuestion(data.question));
     dispatch(setCurrentChoices(data.choices));
-    setChoices(data.choices);
     setQuestionType(data.type);
     setShowTimer(true);
     if (!didClick) {
@@ -98,7 +94,6 @@ export default function Homepage() {
   return quizStart ? (
     <div className="homepage-top-container">
       <div className="rating-div">
-        <p>Rate this question?</p>
         <RateLastQuestion />
       </div>
       {question && (
@@ -131,7 +126,6 @@ export default function Homepage() {
           </div>
           <div className="choicebox-container">
             <ChoiceBox
-              choices={choices}
               questionType={questionType}
               difficulty={difficulty}
               handleQuizStart={handleQuizStart}
