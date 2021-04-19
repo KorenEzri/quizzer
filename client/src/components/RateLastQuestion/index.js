@@ -12,12 +12,13 @@ export default function RateQuestion() {
   const { choices } = useSelector((state) => state);
   const handleRating = async (e) => {
     setRating(e);
-    await network.post(baseUrl, {
+    const questionData = {
       rating: e,
       question: question,
       credibility: answered.answerCount - failed.failedCount,
       choices: choices,
-    });
+    };
+    await network.post(baseUrl, questionData);
     setRating(0);
   };
   return (
