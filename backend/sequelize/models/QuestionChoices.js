@@ -2,8 +2,8 @@ const { Sequelize } = require("sequelize");
 const SavedQuestions = require("./SavedQuestions");
 const db = require("../sequelize");
 
-const QuestionScores = db.define(
-  "question_scores",
+const QuestionChoices = db.define(
+  "question_choices",
   {
     id: {
       type: Sequelize.NUMBER,
@@ -17,13 +17,11 @@ const QuestionScores = db.define(
         allowNull: true,
       },
     },
-    score_1: Sequelize.NUMBER,
-    score_2: Sequelize.NUMBER,
-    score_3: Sequelize.NUMBER,
-    score_4: Sequelize.NUMBER,
-    score_5: Sequelize.NUMBER,
+    is_right_choice: Sequelize.BOOLEAN,
+    choice_country: Sequelize.STRING,
+    choice_data: Sequelize.STRING,
   },
   { freezeTableName: true }
 );
 
-module.exports = QuestionScores;
+module.exports = QuestionChoices;

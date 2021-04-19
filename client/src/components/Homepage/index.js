@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import setCurrentQuestion from "../../redux/redux-actions/setCurrentQuestion";
 import setQuestionsFailed from "../../redux/redux-actions/setQuestionsFailed";
+import setCurrentChoices from "../../redux/redux-actions/setCurrentChoices";
 import classNames from "classnames";
 import "./Homepage.css";
 import Helpers from "../Helpers";
@@ -12,9 +13,9 @@ import BottomHUD from "../BottomHUD";
 import StartQuiz from "../StartQuiz";
 import RateLastQuestion from "../RateLastQuestion/";
 import Score from "../Scoreboard";
-import SignupForm from "../SignupForm";
 import network from "../../network";
 const baseUrl = "http://localhost:3001/api/questions/";
+const player = localStorage.getItem("anon") || localStorage.getItem("user");
 
 export default function Homepage() {
   const dispatch = useDispatch();
@@ -33,6 +34,7 @@ export default function Homepage() {
     const { data } = await network.get(`${baseUrl}question`);
     setShowTimer(false);
     dispatch(setCurrentQuestion(data.question));
+    dispatch(setCurrentChoices(data.choices));
     setChoices(data.choices);
     setQuestionType(data.type);
     setShowTimer(true);
@@ -145,7 +147,6 @@ export default function Homepage() {
     </div>
   ) : (
     <div className="pregame-container">
-      <SignupForm />
       <StartQuiz handleQuizStart={handleQuizStart} />
     </div>
   );
