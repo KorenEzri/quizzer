@@ -12,6 +12,7 @@ import BottomHUD from "../BottomHUD";
 import StartQuiz from "../StartQuiz";
 import RateLastQuestion from "../RateLastQuestion/";
 import Score from "../Scoreboard";
+import SignupForm from "../SignupForm";
 import network from "../../network";
 const baseUrl = "http://localhost:3001/api/questions/";
 
@@ -143,6 +144,9 @@ export default function Homepage() {
       )}
     </div>
   ) : (
-    <StartQuiz handleQuizStart={handleQuizStart} />
+    <div className="pregame-container">
+      <SignupForm />
+      <StartQuiz handleQuizStart={handleQuizStart} />
+    </div>
   );
 }
