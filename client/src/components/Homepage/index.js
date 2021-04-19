@@ -41,13 +41,13 @@ export default function Homepage() {
     console.log(data.choices.rightChoice);
   };
   const handleDifficultyLevel = (questionsAnswered) => {
-    if (questionsAnswered > 2) {
+    if (questionsAnswered > 4) {
       setDifficulty(2);
     }
-    if (questionsAnswered > 5) {
+    if (questionsAnswered > 7) {
       setDifficulty(3);
     }
-    if (questionsAnswered > 11) {
+    if (questionsAnswered > 13) {
       setDifficulty(4);
     }
   };

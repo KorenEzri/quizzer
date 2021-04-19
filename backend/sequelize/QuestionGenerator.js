@@ -1,9 +1,9 @@
-const Template = require("../sequelize/models/Template"); // QUESTION TEMPLATES
-const Countries = require("../sequelize/models/Countries"); // COUNTRY DATA - RATES, REGIONS, ETC
-const Population = require("../sequelize/models/Population"); // POPULATION COUNTS FOR COUNTRIES
-const IndependeceDays = require("../sequelize/models/IndependenceDays"); // SELF EXPLANATORY
-const CountryList = require("../sequelize/models/CountryList"); // SIMPLE LIST OF COUNTRIES THAT WORKS ACROSS ALL DATASETS
-const Capitals = require("../sequelize/models/Capitals");
+const Template = require("./models/Template"); // QUESTION TEMPLATES
+const Countries = require("./models/Countries"); // COUNTRY DATA - RATES, REGIONS, ETC
+const Population = require("./models/Population"); // POPULATION COUNTS FOR COUNTRIES
+const IndependeceDays = require("./models/IndependenceDays"); // SELF EXPLANATORY
+const CountryList = require("./models/CountryList"); // SIMPLE LIST OF COUNTRIES THAT WORKS ACROSS ALL DATASETS
+const Capitals = require("./models/Capitals");
 const { Sequelize } = require("sequelize");
 
 /////////////////////////////////////

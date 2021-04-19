@@ -1,15 +1,15 @@
 const { Router } = require("express");
-const network = require("../sequelize/network");
+const QuestionGenerator = require("../sequelize/QuestionGenerator");
 const questions = Router();
 const DBconnection = require(".././sequelize/sequelize");
 
 questions.get("/question", async (req, res) => {
   try {
-    res.status(200).send(await network.generateRandomQuestion());
+    res.status(200).send(await QuestionGenerator.generateRandomQuestion());
   } catch ({ message }) {
     try {
       console.log("Error, retrying..", message);
-      res.status(200).send(await network.generateRandomQuestion());
+      res.status(200).send(await QuestionGenerator.generateRandomQuestion());
     } catch ({ message }) {
       console.log(message);
       res.status(500).json({
