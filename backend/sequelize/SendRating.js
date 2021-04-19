@@ -4,6 +4,7 @@ const getScore = (rating, check) => {
   return rating === check ? rating : null;
 };
 const saveRating = async (rating, question, choices, credibility) => {
+  console.log(rating, "HERE");
   const falsyChoices = choices.falsies;
   try {
     const [savedQuestion, created] = await SavedQuestions.findOrCreate({

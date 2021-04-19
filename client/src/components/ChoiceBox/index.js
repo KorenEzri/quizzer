@@ -45,7 +45,7 @@ export default function ChoiceBox({
           allChoices.map((choice, index) => {
             let anyChoice = choice[questionType] || choice;
             return (
-              <div className="choice__container">
+              <div className="choice__container" key={`CBcontainer${index}`}>
                 <Choice
                   choice={anyChoice}
                   isRight={

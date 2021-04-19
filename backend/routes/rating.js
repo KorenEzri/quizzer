@@ -3,6 +3,7 @@ const SendRating = require("../sequelize/SendRating");
 const rating = Router();
 
 rating.post("/ratequestion", async (req, res) => {
+  console.log("object");
   const { rating, question, credibility, choices } = req.body;
   if (!rating || !question) return res.status(400).send("No score sent");
   if (credibility < 5) {

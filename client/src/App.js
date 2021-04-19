@@ -1,47 +1,17 @@
 import React from "react";
 import "./App.css";
-import {
-  BrowserRouter as Router,
-  NavLink,
-  Switch,
-  Route,
-} from "react-router-dom";
+import { Router, Switch, Route } from "react-router-dom";
 import Homepage from "./components/Homepage";
+import Leaderboards from "./components/Leaderboards";
+import history from "./history";
 
 function App() {
   return (
-    <Router>
+    <Router history={history}>
       <div className="top-container">
-        <div className="nav-container">
-          <nav className="main__nav">
-            <NavLink
-              exact={true}
-              className="link"
-              activeClassName="is-active"
-              to={"/"}
-            >
-              Overview
-            </NavLink>
-            <NavLink
-              exact={true}
-              className="link"
-              activeClassName="is-active"
-              to={`/playlist/:id`}
-            >
-              playlist
-            </NavLink>
-            <NavLink
-              exact={true}
-              className="link"
-              activeClassName="is-active"
-              to={`/artist/:id`}
-            >
-              artist
-            </NavLink>
-          </nav>
-        </div>
         <Switch>
           <Route exact path="/" component={Homepage} />
+          <Route exact path="/leaderboards" component={Leaderboards} />
         </Switch>
       </div>
     </Router>

@@ -1,8 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useReducer } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { Redirect } from "react-router-dom";
 import setCurrentQuestion from "../../redux/redux-actions/setCurrentQuestion";
 import setQuestionsFailed from "../../redux/redux-actions/setQuestionsFailed";
 import setCurrentChoices from "../../redux/redux-actions/setCurrentChoices";
+import setQuestionsAnswered from "../../redux/redux-actions/setQuestionsAnswered";
 import classNames from "classnames";
 import "./Homepage.css";
 import Helpers from "../Helpers";
@@ -14,18 +16,19 @@ import StartQuiz from "../StartQuiz";
 import RateLastQuestion from "../RateLastQuestion/";
 import Score from "../Scoreboard";
 import network from "../../network";
+import lostTheGame from "./lostgame.jpg";
 const baseUrl = "http://localhost:3001/api/questions/";
-const player = localStorage.getItem("anon") || localStorage.getItem("user");
-
+const saveHighscore = "http://localhost:3001/api/users/highscore/";
 export default function Homepage() {
   const dispatch = useDispatch();
   const [quizStart, setQuizStart] = useState(false);
-  const [questionType, setQuestionType] = useState("");
-  const [difficulty, setDifficulty] = useState(1);
-  const [score, setScore] = useState(0);
+  const [lostGame, setLostGame] = useState(false);
   const [showTimer, setShowTimer] = useState(false);
+  const [score, setScore] = useState(0);
+  const [difficulty, setDifficulty] = useState(1);
+  const [questionType, setQuestionType] = useState("");
   const [questionInterval, setQuestionInterval] = useState("");
-  const { answered, failed, question } = useSelector((state) => state);
+  let { answered, failed, question } = useSelector((state) => state);
 
   const fetchQuestion = async (didClick) => {
     const { data } = await network.get(`${baseUrl}question`);
@@ -83,16 +86,49 @@ export default function Homepage() {
       }, getTimerLength(difficulty))
     );
   };
+  // const prepareNewGame = async () => {
+  //   setQuizStart(false);
+  //   setScore(0);
+  //   clearInterval(questionInterval);
+  //   question = "";
+  //   answered.answeredCount = 0;
+  //   failed.failedCount = 0;
+  //   dispatch(setQuestionsFailed(failed.failedCount));
+  //   dispatch(setQuestionsAnswered(answered.answeredCount));
+  //   setQuestionInterval("");
+  //   dispatch(setCurrentChoices(""));
+  //   dispatch(setCurrentQuestion(""));
+  //   setDifficulty(1);
+  //   setLostGame(false);
+  // };
+
+  const handleGameEnd = async () => {
+    await network.post(saveHighscore, {
+      score,
+      user: localStorage.getItem("anon"),
+    });
+    clearInterval(questionInterval);
+  };
 
   useEffect(() => {
-    (() => {
+    (async () => {
+      if (!quizStart) return;
+      if (failed.failedCount > 2) {
+        setLostGame(true);
+        await handleGameEnd();
+        // await prepareNewGame();
+        return;
+      }
       setScore(answered.answerCount - failed.failedCount);
       handleDifficultyLevel(answered.answerCount);
     })();
-  }, [answered.answerCount, failed.failedCount]);
+  }, [answered, failed]);
 
   return quizStart ? (
     <div className="homepage-top-container">
+      {lostGame && (
+        <img alt="lostgame" src={lostTheGame} className="lost_the_game" />
+      )}
       <div className="rating-div">
         <RateLastQuestion />
       </div>
@@ -102,12 +138,13 @@ export default function Homepage() {
             game__container: true,
             mid: difficulty === 3,
             hard: difficulty === 4,
+            lost: lostGame,
           })}
         >
           <div className="question__container">
             <Question question={question} />
             <div className="scoreboard-container">
-              <Score playerScore={score} />
+              {localStorage.getItem("anon")} <Score playerScore={score} />
             </div>
           </div>
           <div
@@ -125,11 +162,13 @@ export default function Homepage() {
             <Helpers />
           </div>
           <div className="choicebox-container">
-            <ChoiceBox
-              questionType={questionType}
-              difficulty={difficulty}
-              handleQuizStart={handleQuizStart}
-            />
+            {!lostGame && (
+              <ChoiceBox
+                questionType={questionType}
+                difficulty={difficulty}
+                handleQuizStart={handleQuizStart}
+              />
+            )}
           </div>
           {difficulty > 3 && (
             <div className="bottomHUD-container">
