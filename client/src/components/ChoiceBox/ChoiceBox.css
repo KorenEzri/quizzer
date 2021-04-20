@@ -34,8 +34,6 @@
 }
 
 .choice__container:hover {
-  -webkit-transition: 350ms;
-  transition: 350ms;
   padding: 9px;
 }
 

@@ -1,0 +1,128 @@
+::-webkit-scrollbar {
+  width: 12px;
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-track {
+  border-radius: 6px;
+  background: #3e573c;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 6px;
+  background: #bfeeb9;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  border-radius: 6px;
+  background: #a3dba6;
+}
+
+html {
+  overflow-x: hidden;
+}
+
+.scoreboard {
+  margin-top: 60px;
+  border-collapse: collapse;
+  display: table;
+}
+
+.table-container-div {
+  width: 100vw;
+  border-bottom: 1px solid white;
+}
+
+.thead__container {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  width: 25vw;
+  float: left;
+  padding-bottom: 30px;
+}
+
+.scoreboard-table__data {
+  text-align: center;
+  font-weight: 700;
+  width: 30vw;
+  height: 6vh;
+  padding-top: 40px;
+  word-break: break-all;
+}
+
+@media (max-width: 1200px) {
+  .scoreboard-table__data {
+    padding-left: 60px;
+    font-size: 14px;
+  }
+}
+
+.scoreboard-search-container {
+  padding-left: 30px;
+}
+
+.scoreboard-table__search {
+  padding: 8px;
+  outline: none;
+  border: none;
+  position: absolute;
+  letter-spacing: 0.2px;
+  padding: 10px;
+  padding-left: 30px;
+  width: 300px;
+  font-size: 14px;
+  outline: none;
+  border: none;
+  border-radius: 4px;
+  background-color: #eeeded;
+  margin-top: -45px;
+}
+
+.scoreboard__searchicon {
+  position: absolute;
+  padding-left: 2px;
+  left: 34px;
+  top: -36px;
+  z-index: 9001;
+}
+
+.absloutely {
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+.player_icon {
+  -webkit-transition: 400ms;
+  transition: 400ms;
+  -webkit-box-shadow: 1px 0px 5px 4px #000000a2;
+  box-shadow: 1px 0px 5px 1px #000000a9;
+  margin-top: 30px;
+  position: absolute;
+  margin-left: 1vw;
+}
+
+@media (max-width: 1200px) {
+  .player_icon {
+    -webkit-transition: 400ms;
+    transition: 400ms;
+  }
+}
+
+.table_row {
+  background: #94bbe9;
+  background: -webkit-gradient(linear, left top, right top, color-stop(3%, #94bbe9), color-stop(88%, #74d663));
+  background: linear-gradient(90deg, #94bbe9 3%, #74d663 88%);
+}
+
+.table__container {
+  overflow-y: scroll;
+  height: 82vh;
+  overflow-x: hidden;
+}
+/*# sourceMappingURL=Board.css.map */

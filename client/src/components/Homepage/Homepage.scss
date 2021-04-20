@@ -101,11 +101,11 @@
   margin-right: auto;
 }
 .lost_the_game {
-  z-index: 9001;
   position: absolute;
   width: 600px;
   height: 500px;
-  margin-left: 20vw;
+  margin-left: 25%;
+  margin-right: auto;
   margin-top: 17vh;
   padding: 40px;
   background: linear-gradient(
@@ -123,17 +123,63 @@
   animation-duration: 7s;
   -webkit-animation-fill-mode: both;
   animation-fill-mode: both;
+  @media (max-width: 800px) {
+    padding: 20px;
+    margin-left: 10%;
+    width: 400px;
+    height: 400px;
+  }
+  @media (min-width: 2200px) {
+    padding: 20px;
+    margin-left: 35%;
+    width: 700px;
+    height: 700px;
+  }
+}
+.second {
+  margin-left: 0;
+  padding: 10px;
+  width: 300px;
+  height: 400px;
+  animation: gradient 5s ease;
+  -webkit-animation-name: slideInUp;
+  animation-name: slideInUp;
+  -webkit-animation-duration: 17s;
+  animation-duration: 17s;
+  -webkit-animation-fill-mode: both;
+  animation-fill-mode: both;
+}
+.third {
+  margin-left: 80vw;
+  padding: 4px;
+  width: 300px;
+  height: 400px;
+  animation: gradient 5s ease;
+  -webkit-animation-name: slideInUp;
+  animation-name: slideInUp;
+  -webkit-animation-duration: 4s;
+  animation-duration: 4s;
+  -webkit-animation-fill-mode: both;
+  animation-fill-mode: both;
+}
+.fourth {
+  margin-left: 60vw;
+  margin-top: 0;
+  padding: 4px;
+  width: 300px;
+  height: 400px;
+  transform: rotate(20deg) !important;
+}
+.fifth {
+  margin-left: 50vw;
+  margin-top: 35vw;
+  padding: 4px;
+  width: 300px;
+  height: 400px;
+  transform: rotate(180deg) !important;
 }
 .lost {
-  background: linear-gradient(
-    -45deg,
-    grey,
-    rgb(70, 68, 68),
-    rgb(43, 42, 42),
-    rgb(27, 27, 27)
-  );
-  animation: gradient 4s ease;
-  background-size: 400% 400%;
+  display: none;
 }
 .duration_one {
   --duration: 12;
@@ -315,4 +361,48 @@
 }
 html {
   background-color: whitesmoke;
+}
+.lost__links {
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.6cm;
+  color: darkred;
+  transition: 300ms;
+  background-color: rgb(169, 226, 55);
+  padding: 5px;
+  border-radius: 6px;
+  margin-right: 10px;
+  margin-left: 10px;
+}
+.lost__links:hover {
+  transition: 300ms;
+  background-color: rgb(139, 189, 39);
+  color: rgb(250, 250, 250);
+}
+.lost__links:active {
+  transition: 0ms;
+  background-color: rgb(108, 145, 36);
+}
+.leaderboard-home__link {
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.8cm;
+  color: darkred;
+  transition: 300ms;
+  background-color: rgb(169, 226, 55);
+  padding: 5px;
+  border-radius: 6px;
+  margin-top: 60px;
+  height: 80px;
+  width: 300px;
+  margin-left: 40vw;
+}
+.leaderboard-home__link:hover {
+  transition: 300ms;
+  background-color: rgb(139, 189, 39);
+  color: rgb(250, 250, 250);
+}
+.leaderboard-home__link:active {
+  transition: 0ms;
+  background-color: rgb(108, 145, 36);
 }

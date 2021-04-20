@@ -2,6 +2,7 @@ import questionsAnswered from "./questionsAnswered";
 import questionsFailed from "./questionsFailed";
 import currentQuestion from "./currentQuestion";
 import currentChoices from "./currentChoices";
+import scores from "./scores";
 import { combineReducers } from "redux";
 
 const rootReducer = combineReducers({
@@ -9,6 +10,7 @@ const rootReducer = combineReducers({
   failed: questionsFailed,
   question: currentQuestion,
   choices: currentChoices,
+  scores: scores,
 });
 
 export default rootReducer;
