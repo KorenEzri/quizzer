@@ -4,12 +4,16 @@ const Population = require("./models/Population"); // POPULATION COUNTS FOR COUN
 const IndependeceDays = require("./models/IndependenceDays"); // SELF EXPLANATORY
 const CountryList = require("./models/CountryList"); // SIMPLE LIST OF COUNTRIES THAT WORKS ACROSS ALL DATASETS
 const Capitals = require("./models/Capitals");
+const SavedQuestions = require("./models/SavedQuestions");
+const SendRating = require("./SendRating");
 const { Sequelize } = require("sequelize");
 
 /////////////////////////////////////
 //  !!!!!!!     FLOW:     !!!!!!!
 /////////////////////////////////////
 let correctAnswer;
+let currentQuestion;
+let round = 0;
 let userScore = 0;
 
 const deepEqual = (x, y) => {
@@ -21,28 +25,120 @@ const deepEqual = (x, y) => {
         ok(x).every((key) => deepEqual(x[key], y[key]))
     : x === y;
 };
-const determineQuestionSource = () => {};
-const getQuestionFromDB = () => {};
+const determineQuestionSource = () => {
+  return "db";
+};
+const getQuestionFromDB = async () => {
+  const fullQuestion = getRandomElements(
+    await SavedQuestions.findAll({}),
+    1
+  )[0];
+  const choices = {
+    falsies: [
+      {
+        country: fullQuestion.choice_1_country,
+        data: fullQuestion.choice_1_data,
+      },
+      {
+        country: fullQuestion.choice_2_country,
+        data: fullQuestion.choice_2_data,
+      },
+      {
+        country: fullQuestion.choice_3_country,
+        data: fullQuestion.choice_3_data,
+      },
+    ],
+    rightChoice: {
+      country: fullQuestion.choice_correct_country,
+      data: fullQuestion.choice_correct_data,
+    },
+  };
+  // if (choices.rightChoice.country == null) {
+  //   choices.rightChoice = choices.rightChoice.data || choices.rightChoice
+  // }
+  correctAnswer = choices.rightChoice;
+  currentQuestion = {
+    question: fullQuestion.question_full,
+    choices,
+  };
+  const clientChoices = choices.falsies
+    .concat([correctAnswer])
+    .map((choice) => {
+      if (choice.country == null) return choice.data;
+    });
+  const clientQuestion = {
+    question: fullQuestion.question_full,
+    choices: clientChoices,
+  };
+  return clientQuestion;
+};
 const generateQuestion = async () => {
   const source = determineQuestionSource();
-  return source === "db"
-    ? await getQuestionFromDB()
-    : await generateRandomQuestion();
+  let question;
+  if (source === "db") {
+    question = await getQuestionFromDB();
+  } else {
+    question = await generateRandomQuestion();
+  }
+  console.log("CORRECT: ", correctAnswer);
+  return question;
 };
-const checkIfCorrect = (answer) => {
+const checkIfCorrect = (answer, difficulty) => {
+  let score = userScore;
+  let decrement = 1;
+  let increment = 1;
+  if (difficulty > 2) {
+    if (round > 2) {
+      decrement = 3;
+      increment = 2;
+    }
+  } else {
+    round = 3;
+  }
+  if (difficulty > 3) {
+    if (round > 3) {
+      increment = 3;
+    } else {
+      round = 4;
+    }
+  }
   let isCorrect;
   if (!(answer instanceof Object)) {
-    isCorrect = answer === correctAnswer;
-    isCorrect ? userScore++ : userScore--;
-    return isCorrect;
+    isCorrect = answer === correctAnswer || correctAnswer.data === answer;
   } else {
     isCorrect = deepEqual(answer, correctAnswer);
-    isCorrect ? userScore++ : userScore--;
-    return isCorrect;
   }
+  if (isCorrect) {
+    userScore = score + increment;
+  } else {
+    userScore = score - decrement;
+  }
+  console.log("USER SCORE: ", userScore);
+  return isCorrect;
+};
+const initRatingSequence = async (score) => {
+  if (!verifyScores(score)) {
+    console.log("ERROR WITH VERIFY SCORE, score: ", score);
+    return;
+  }
+  await SendRating.triggerRatingSequence(score);
+};
+const handleGameEnd = async () => {
+  SendRating.receieveRatingRequest(null, null, null, null, "gameEnd");
+  userScore = 0;
+  round = 0;
+  correctAnswer = "";
+  currentQuestion = "";
 };
 const verifyScores = (score) => {
-  return score === userScore + 1;
+  if (Math.abs(score - userScore) <= 5 || Math.abs(userScore - score) <= 5)
+    return true;
+  else {
+    return false;
+  }
+};
+const getFullQuestionForRating = () => {
+  return currentQuestion;
 };
 // FUNC generateRandomQuestion() => gets random question template and random country names
 const generateRandomQuestion = async () => {
@@ -63,6 +159,7 @@ const generateRandomQuestion = async () => {
     allCountries,
     template_ans_type
   );
+  currentQuestion = questionBody;
   correctAnswer = questionBody.choices.rightChoice;
   clientQuestion = {
     type: questionBody.type,
@@ -70,7 +167,6 @@ const generateRandomQuestion = async () => {
     choices: questionBody.choices.falsies.concat([correctAnswer]),
   };
   console.log("CORRECT:", correctAnswer);
-
   return clientQuestion;
 };
 // calls FUNC getRelevantQuestionParams() => SWITCH case
@@ -393,4 +489,11 @@ const shuffleArray = (array) => {
   }
   return array;
 };
-module.exports = { generateQuestion, checkIfCorrect, verifyScores };
+module.exports = {
+  generateQuestion,
+  checkIfCorrect,
+  verifyScores,
+  getFullQuestionForRating,
+  handleGameEnd,
+  initRatingSequence,
+};

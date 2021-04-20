@@ -18,9 +18,11 @@ users.post("/createanon", async (req, res) => {
   }
 });
 users.post("/highscore", async (req, res) => {
-  const { score, user } = req.body;
+  const { score, user, elapsedTime } = req.body;
   try {
-    res.status(200).send(await UserManager.updateHighscore(score, user));
+    res
+      .status(200)
+      .send(await UserManager.updateHighscore(score, user, elapsedTime));
   } catch ({ message }) {
     console.log(message);
     res.status(500).json({ message: "Failed to update highscore!", message });

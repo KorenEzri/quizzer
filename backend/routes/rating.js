@@ -1,21 +1,33 @@
 const { Router } = require("express");
 const SendRating = require("../sequelize/SendRating");
+const QuestionGenerator = require("../sequelize/QuestionGenerator");
 const rating = Router();
 
-rating.post("/ratequestion", async (req, res) => {
-  console.log("object");
-  const { rating, question, credibility, choices } = req.body;
-  if (!rating || !question) return res.status(400).send("No score sent");
-  if (credibility < 5) {
-    res.status(200).send("Rating not saved");
-    return;
-  }
+rating.post("/ratequestion", (req, res) => {
+  const { rating, credibilityPoints, timeElapsed, name } = req.body;
+  const credibility = { credibilityPoints, timeElapsed };
+  if (!rating) return res.status(400).send("No score sent");
   try {
-    await SendRating.saveRating(rating, question, choices, credibility);
+    SendRating.receieveRatingRequest(
+      rating,
+      QuestionGenerator.getFullQuestionForRating(),
+      credibility,
+      name
+    );
     res.status(200).send("Rating saved!");
   } catch ({ message }) {
-    res.status(500).json({ message: "Failed to save rating!", message });
+    res.status(500).json({ message: "Failed to save ratings!", message });
   }
 });
 
+rating.post("/triggersequence", async (req, res) => {
+  const { score } = req.body;
+  try {
+    await QuestionGenerator.initRatingSequence(score);
+    res.status(200).send("OK");
+  } catch ({ message }) {
+    console.log("ERROR WITH /triggersequence at rating.js at ~line 23");
+    res.status(500).send("Failed to save ratings");
+  }
+});
 module.exports = rating;

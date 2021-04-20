@@ -18,6 +18,8 @@ import LostTheGame from "../LostTheGame";
 import network from "../../network";
 const baseUrl = "http://localhost:3001/api/questions/";
 const saveHighscore = "http://localhost:3001/api/users/highscore/";
+const triggerRatingSequence =
+  "http://localhost:3001/api/rating/triggersequence";
 
 export default function Homepage() {
   const dispatch = useDispatch();
@@ -28,6 +30,8 @@ export default function Homepage() {
   const [difficulty, setDifficulty] = useState(1);
   const [questionType, setQuestionType] = useState("");
   const [questionInterval, setQuestionInterval] = useState("");
+  const [elapsedTime, setElapsedTime] = useState(0);
+  const [startDate, setStartDate] = useState(0);
   let { answered, failed, question } = useSelector((state) => state);
 
   const fetchQuestion = async (didClick) => {
@@ -68,6 +72,8 @@ export default function Homepage() {
   };
   const handleQuizStart = async (next) => {
     if (next) {
+      const currentDate = new Date();
+      setElapsedTime(currentDate - Date.parse(startDate));
       clearInterval(questionInterval);
       await fetchQuestion("didClick");
       setQuestionInterval(
@@ -77,6 +83,8 @@ export default function Homepage() {
       );
       return;
     }
+    await network.get(`${baseUrl}/end`);
+    setStartDate(new Date());
     await fetchQuestion("didClick");
     setQuizStart(true);
     setQuestionInterval(
@@ -86,10 +94,14 @@ export default function Homepage() {
     );
   };
   const handleGameEnd = async () => {
+    await network.post(triggerRatingSequence, { score });
+    const endDate = new Date();
+    setElapsedTime(endDate - Date.parse(startDate));
     clearInterval(questionInterval);
-    network.post(saveHighscore, {
+    await network.post(saveHighscore, {
       score,
       user: localStorage.getItem("anon"),
+      elapsedTime,
     });
   };
 
@@ -111,7 +123,7 @@ export default function Homepage() {
       {lostGame && <LostTheGame />}
       {!lostGame ? (
         <div className="rating-div">
-          <RateLastQuestion />
+          <RateLastQuestion elapsedTime={elapsedTime} />
         </div>
       ) : (
         <div className="lost_game_homebuttons">

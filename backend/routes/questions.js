@@ -18,16 +18,20 @@ questions.get("/question", async (req, res) => {
   }
 });
 questions.put("/answer", async (req, res) => {
-  const { answer } = req.body;
-  console.log(answer);
+  const { answer, difficulty } = req.body;
   try {
-    res.status(200).send(QuestionGenerator.checkIfCorrect(answer));
+    res.status(200).send(QuestionGenerator.checkIfCorrect(answer, difficulty));
   } catch ({ message }) {
     console.log(message);
     res
       .status(500)
       .send(`There was a problem processing the request, ${message}`);
   }
+});
+
+questions.get("/end", async (req, res) => {
+  QuestionGenerator.handleGameEnd();
+  res.status(200).send("OK");
 });
 
 module.exports = questions;

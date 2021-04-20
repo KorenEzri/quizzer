@@ -24,6 +24,11 @@ const SavedQuestions = db.define(
     score_3: Sequelize.NUMBER,
     score_4: Sequelize.NUMBER,
     score_5: Sequelize.NUMBER,
+    last_rated_by: Sequelize.STRING,
+    last_rating: Sequelize.NUMBER,
+    final_score: Sequelize.NUMBER,
+    concatinated_score: Sequelize.NUMBER,
+    concatinated_score_with_rates: Sequelize.NUMBER,
   },
   {
     freezeTableName: true,

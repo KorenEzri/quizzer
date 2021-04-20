@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import network from "../../network";
 const baseUrl = "http://localhost:3001/api/rating/ratequestion";
 
-export default function RateQuestion() {
+export default function RateQuestion({ elapsedTime }) {
   const [rating, setRating] = useState(0);
   const [userHasRated, setUserHasRated] = useState(false);
   const { question, answered, failed, choices } = useSelector((state) => state);
@@ -14,8 +14,10 @@ export default function RateQuestion() {
     const questionData = {
       rating: e,
       question: question,
-      credibility: answered.answerCount - failed.failedCount,
+      credibilityPoints: answered.answerCount - failed.failedCount,
+      timeElapsed: elapsedTime,
       choices: choices,
+      name: localStorage.getItem("anon"),
     };
     await network.post(baseUrl, questionData);
     setUserHasRated(true);

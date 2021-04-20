@@ -43,8 +43,8 @@ export default function Choice({
       pointsToDecrement = failHard;
       break;
     case 4:
-      pointsToDecrement = failHard;
       pointsToIncrement = ansHard;
+      pointsToDecrement = failHard;
       break;
     default:
       break;
@@ -78,6 +78,7 @@ export default function Choice({
         console.log(userAnswer);
         const { data } = await network.put(askIfCorrect, {
           answer: userAnswer,
+          difficulty: difficulty,
         });
         if (data) {
           dispatch(pointsToIncrement(answered.answerCount));

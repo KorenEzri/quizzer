@@ -12,6 +12,10 @@ const AnonUsers = db.define(
     name: Sequelize.STRING,
     highscore: Sequelize.NUMBER,
     highscore_date: Sequelize.DATE,
+    time_played: Sequelize.NUMBER,
+    last_rating: Sequelize.NUMBER,
+    last_game_score: Sequelize.NUMBER,
+    last_game_elapsed: Sequelize.NUMBER,
   },
   { freezeTableName: true }
 );
