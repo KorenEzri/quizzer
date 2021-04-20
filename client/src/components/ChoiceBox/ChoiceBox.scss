@@ -13,17 +13,20 @@
   margin: 0.5cm;
   margin-left: auto;
   margin-right: auto;
-  width: 200px;
-  padding: 6px;
+  width: 220px;
+  height: 40px;
   background: rgba(255, 255, 255, 0.329);
   border-radius: 5px;
   animation: color-change 26s infinite;
   font-weight: 600;
   font-size: 0.5cm;
 }
+.choice__container * {
+  padding-top: 6px;
+}
 .choice__container:hover {
+  background: rgba(255, 255, 255, 0.521);
   transition: 350ms;
-  padding: 9px;
 }
 .choice__container:active {
   transition: 2ms;

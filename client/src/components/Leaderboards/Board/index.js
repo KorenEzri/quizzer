@@ -3,6 +3,7 @@ import { useState, useMemo } from "react";
 import Jdenticon from "react-jdenticon";
 import { useTable, useFilters } from "react-table";
 import SearchIcon from "@material-ui/icons/Search";
+import poopKING from "./poopking.png";
 import "./Board.css";
 
 const getRandomColor = () => {
@@ -15,23 +16,23 @@ const getRandomColor = () => {
 };
 
 export default function Board({ scores }) {
+  scores.sort(function (a, b) {
+    return b.highscore - a.highscore;
+  });
   const data = useMemo(
     () =>
-      scores.map((user) => {
+      scores.map((user, index) => {
         const hs = user.highscore || 0;
         return {
           player: user.name,
           highscore: hs,
           joined: user.createdAt,
           at: user.highscore_date,
+          index: index,
         };
       }),
     []
   );
-
-  data.sort(function (a, b) {
-    return b.highscore - a.highscore;
-  });
 
   const [filterInput, setFilterInput] = useState("");
 
@@ -110,7 +111,11 @@ export default function Board({ scores }) {
               <div key={`${index}tbody`} className="table-container-div">
                 <div className="absloutely">
                   <div className="player_icon">
-                    <Jdenticon size="42" value={`${row.original.player}`} />
+                    {!(row.original.index === 0) ? (
+                      <Jdenticon size="42" value={`${row.original.player}`} />
+                    ) : (
+                      <img src={poopKING} alt="kaki KING!" className="kaking" />
+                    )}
                   </div>
                 </div>
                 <tr {...row.getRowProps()} className="table_row">

@@ -485,8 +485,8 @@ html {
 .leaderboard-home__link:hover {
   -webkit-transition: 300ms;
   transition: 300ms;
-  background-color: #8bbd27;
-  color: #fafafa;
+  background-color: rgba(186, 240, 78, 0.555);
+  color: white;
 }
 
 .leaderboard-home__link:active {
