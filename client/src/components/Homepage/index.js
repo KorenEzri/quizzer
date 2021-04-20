@@ -40,7 +40,6 @@ export default function Homepage() {
     if (!didClick) {
       dispatch(setQuestionsFailed(failed.failedCount));
     }
-    console.log(data.choices.rightChoice);
   };
   const handleDifficultyLevel = (questionsAnswered) => {
     if (questionsAnswered > 4) {

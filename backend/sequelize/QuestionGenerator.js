@@ -9,6 +9,41 @@ const { Sequelize } = require("sequelize");
 /////////////////////////////////////
 //  !!!!!!!     FLOW:     !!!!!!!
 /////////////////////////////////////
+let correctAnswer;
+let userScore = 0;
+
+const deepEqual = (x, y) => {
+  const ok = Object.keys,
+    tx = typeof x,
+    ty = typeof y;
+  return x && y && tx === "object" && tx === ty
+    ? ok(x).length === ok(y).length &&
+        ok(x).every((key) => deepEqual(x[key], y[key]))
+    : x === y;
+};
+const determineQuestionSource = () => {};
+const getQuestionFromDB = () => {};
+const generateQuestion = async () => {
+  const source = determineQuestionSource();
+  return source === "db"
+    ? await getQuestionFromDB()
+    : await generateRandomQuestion();
+};
+const checkIfCorrect = (answer) => {
+  let isCorrect;
+  if (!(answer instanceof Object)) {
+    isCorrect = answer === correctAnswer;
+    isCorrect ? userScore++ : userScore--;
+    return isCorrect;
+  } else {
+    isCorrect = deepEqual(answer, correctAnswer);
+    isCorrect ? userScore++ : userScore--;
+    return isCorrect;
+  }
+};
+const verifyScores = (score) => {
+  return score === userScore + 1;
+};
 // FUNC generateRandomQuestion() => gets random question template and random country names
 const generateRandomQuestion = async () => {
   const allCountries = shuffleArray(
@@ -22,13 +57,21 @@ const generateRandomQuestion = async () => {
   const templates = await Template.findAll();
   const randomTemplate = getRandomElements(templates, 1);
   const { template_reqs, template, template_ans_type } = randomTemplate[0];
-  const questionBody = getRelevantQuestionParams(
+  const questionBody = await getRelevantQuestionParams(
     template_reqs,
     template,
     allCountries,
     template_ans_type
   );
-  return questionBody;
+  correctAnswer = questionBody.choices.rightChoice;
+  clientQuestion = {
+    type: questionBody.type,
+    question: questionBody.question,
+    choices: questionBody.choices.falsies.concat([correctAnswer]),
+  };
+  console.log("CORRECT:", correctAnswer);
+
+  return clientQuestion;
 };
 // calls FUNC getRelevantQuestionParams() => SWITCH case
 // to determine question body + amount of countries in question
@@ -350,4 +393,4 @@ const shuffleArray = (array) => {
   }
   return array;
 };
-module.exports = { generateRandomQuestion };
+module.exports = { generateQuestion, checkIfCorrect, verifyScores };

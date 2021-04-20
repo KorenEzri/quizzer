@@ -23,17 +23,13 @@ export default function ChoiceBox({
   difficulty,
 }) {
   const { choices } = useSelector((state) => state);
-  const { rightChoice, falsies } = choices;
-  if (!falsies) return null;
-
+  if (!choices) return null;
   const allChoices = Array.from(
     new Set(
       shuffleChoices(
-        falsies
-          .map((falseChoice) => {
-            return falseChoice[questionType] || falseChoice;
-          })
-          .concat(rightChoice)
+        choices.map((choice) => {
+          return choice[questionType] || choice;
+        })
       )
     )
   );
@@ -41,17 +37,14 @@ export default function ChoiceBox({
   return (
     <div className="choiceBox-component">
       <ul className="choice__list">
-        {questionType !== "truefalse" && rightChoice ? (
+        {questionType !== "truefalse" ? (
           allChoices.map((choice, index) => {
             let anyChoice = choice[questionType] || choice;
             return (
               <div className="choice__container" key={`CBcontainer${index}`}>
                 <Choice
+                  choices={choices}
                   choice={anyChoice}
-                  isRight={
-                    anyChoice === rightChoice[questionType] ||
-                    anyChoice === rightChoice
-                  }
                   index={index + 1}
                   handleQuizStart={handleQuizStart}
                   difficulty={difficulty}
@@ -64,8 +57,8 @@ export default function ChoiceBox({
             <div className="choice__container">
               <Choice
                 key={"true"}
-                choice={allChoices[0].country}
-                isRight={allChoices[0].country === rightChoice.country}
+                choices={choices}
+                choice={allChoices[0].country || allChoices[0]}
                 difficulty={difficulty}
                 handleQuizStart={handleQuizStart}
               />
@@ -73,8 +66,8 @@ export default function ChoiceBox({
             <div className="choice__container">
               <Choice
                 key={"false"}
-                choice={allChoices[1].country}
-                isRight={allChoices[1].country === rightChoice.country}
+                choices={choices}
+                choice={allChoices[1].country || allChoices[1]}
                 difficulty={difficulty}
                 handleQuizStart={handleQuizStart}
               />

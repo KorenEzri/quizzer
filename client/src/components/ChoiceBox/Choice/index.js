@@ -5,19 +5,22 @@ import ansEasy from "../../../redux/redux-actions/answers/ansEasy";
 import ansMid from "../../../redux/redux-actions/answers/ansMid";
 import ansHard from "../../../redux/redux-actions/answers/ansHard";
 import failHard from "../../../redux/redux-actions/fails/failHard";
+import network from "../../../network";
+const askIfCorrect = "http://localhost:3001/api/questions/answer/";
+
 export default function Choice({
   choice,
-  isRight,
   index,
   handleQuizStart,
   difficulty,
+  choices,
 }) {
   const addCommas = (nStr) => {
     nStr += "";
-    var x = nStr.split(".");
-    var x1 = x[0];
-    var x2 = x.length > 1 ? "." + x[1] : "";
-    var rgx = /(\d+)(\d{3})/;
+    let x = nStr.split(".");
+    let x1 = x[0];
+    let x2 = x.length > 1 ? "." + x[1] : "";
+    let rgx = /(\d+)(\d{3})/;
     while (rgx.test(x1)) {
       x1 = x1.replace(rgx, "$1" + "," + "$2");
     }
@@ -49,14 +52,34 @@ export default function Choice({
   let { answered } = useSelector((state) => state);
   let { failed } = useSelector((state) => state);
   const dispatch = useDispatch();
+
+  const findFullChoice = (userAnswer) => {
+    let index;
+    choices.forEach((choice, i) => {
+      if (choice instanceof Object) {
+        Object.values(choice).forEach((value) => {
+          if (value === userAnswer) {
+            index = i;
+          }
+        });
+      } else if (choice === userAnswer || userAnswer === addCommas(choice)) {
+        index = i;
+      }
+    });
+    return choices[index];
+  };
+
   return (
     <li
       key={`choice-${index}`}
       className="choicebox__choice"
-      isright={`${isRight}`}
       onClick={async ({ target }) => {
-        const isCorrect = target.getAttribute("isright") === "true";
-        if (isCorrect) {
+        const userAnswer = findFullChoice(target.textContent);
+        console.log(userAnswer);
+        const { data } = await network.put(askIfCorrect, {
+          answer: userAnswer,
+        });
+        if (data) {
           dispatch(pointsToIncrement(answered.answerCount));
           await handleQuizStart("next");
         } else {

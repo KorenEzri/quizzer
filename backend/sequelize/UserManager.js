@@ -1,6 +1,7 @@
 const AnonUsers = require("../sequelize/models/AnonUsers");
+const QuestionGenerator = require("./QuestionGenerator");
 const sequelize = require("../sequelize/sequelize");
-const { Sequelize } = require("sequelize");
+const users = require("../routes/users");
 
 const createAnonUser = async (user) => {
   try {
@@ -19,20 +20,33 @@ const createAnonUser = async (user) => {
     return "ERROR";
   }
 };
-
 const updateHighscore = async (score, user) => {
   const date = new Date().toISOString().slice(0, 19).replace("T", " ");
-  try {
-    await sequelize.query(`update anon_users
-                            set highscore = ${score}
-                            where name = "${user}"
-                            and highscore < ${score}`);
-    await sequelize.query(`update anon_users set highscore_date="${date}"
-    where name="${user}"`);
-    return "OK";
-  } catch ({ message }) {
-    console.log(message);
-    return "ERROR";
+  if (QuestionGenerator.verifyScores(score)) {
+    try {
+      await sequelize.query(`update anon_users
+                              set highscore = ${score}
+                              where name = "${user}"
+                              and highscore < ${score}`);
+      await sequelize.query(`update anon_users set highscore_date="${date}"
+      where name="${user}"`);
+      return "OK";
+    } catch ({ message }) {
+      console.log(message);
+      return "ERROR";
+    }
+  } else {
+    try {
+      await sequelize.query(`update anon_users
+                              set highscore = -99999
+                              where name = "${user}"`);
+      await sequelize.query(`update anon_users set highscore_date="${date}"
+      where name="${user}"`);
+      return "Cheater!!";
+    } catch ({ message }) {
+      console.log(message);
+      return "ERROR";
+    }
   }
 };
 
