@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from "react";
-import history from "../../history";
 import { useSelector, useDispatch } from "react-redux";
-import Swal from "sweetalert2";
-import withReactContent from "sweetalert2-react-content";
 import setCurrentQuestion from "../../redux/redux-actions/setCurrentQuestion";
 import setQuestionsFailed from "../../redux/redux-actions/setQuestionsFailed";
 import setCurrentChoices from "../../redux/redux-actions/setCurrentChoices";
@@ -16,14 +13,14 @@ import BottomHUD from "../BottomHUD";
 import StartQuiz from "../StartQuiz";
 import RateLastQuestion from "../RateLastQuestion/";
 import Score from "../Scoreboard";
+import NavButtons from "../NavButtons";
+import LostTheGame from "../LostTheGame";
 import network from "../../network";
-import lostTheGame from "./lostgame.jpg";
 const baseUrl = "http://localhost:3001/api/questions/";
 const saveHighscore = "http://localhost:3001/api/users/highscore/";
 
 export default function Homepage() {
   const dispatch = useDispatch();
-  const MySwal = withReactContent(Swal);
   const [quizStart, setQuizStart] = useState(false);
   const [lostGame, setLostGame] = useState(false);
   const [showTimer, setShowTimer] = useState(false);
@@ -89,44 +86,12 @@ export default function Homepage() {
       }, getTimerLength(difficulty))
     );
   };
-
   const handleGameEnd = async () => {
     clearInterval(questionInterval);
-    network
-      .post(saveHighscore, {
-        score,
-        user: localStorage.getItem("anon"),
-      })
-      .then(
-        MySwal.fire({
-          title: <p>You lost..</p>,
-          footer: `SCORE: ${score} `,
-          html: (
-            <div>
-              <button
-                className="lost__links"
-                onClick={async (e) => {
-                  history.replace("/leaderboards");
-                  window.location.reload();
-                  MySwal.close();
-                }}
-              >
-                Leaderboards
-              </button>
-              <button
-                className="lost__links"
-                onClick={async (e) => {
-                  MySwal.close();
-                  window.location.reload();
-                }}
-              >
-                Start over
-              </button>
-            </div>
-          ),
-          showConfirmButton: false,
-        })
-      );
+    network.post(saveHighscore, {
+      score,
+      user: localStorage.getItem("anon"),
+    });
   };
 
   useEffect(() => {
@@ -144,39 +109,16 @@ export default function Homepage() {
 
   return quizStart ? (
     <div className="homepage-top-container">
-      {lostGame && (
-        <div>
-          <img alt="lostgame" src={lostTheGame} className="lost_the_game" />
-          <img
-            alt="lostgame"
-            src={lostTheGame}
-            className="lost_the_game second"
-          />
-          <img
-            alt="lostgame"
-            src={lostTheGame}
-            className="lost_the_game third"
-          />
-          <img
-            alt="lostgame"
-            src={lostTheGame}
-            className="lost_the_game fourth"
-          />
-          <img
-            alt="lostgame"
-            src={lostTheGame}
-            className="lost_the_game fifth"
-          />
-          <img
-            alt="lostgame"
-            src={lostTheGame}
-            className="lost_the_game sixth"
-          />
+      {lostGame && <LostTheGame />}
+      {!lostGame ? (
+        <div className="rating-div">
+          <RateLastQuestion />
+        </div>
+      ) : (
+        <div className="lost_game_homebuttons">
+          <NavButtons />
         </div>
       )}
-      <div className="rating-div">
-        <RateLastQuestion />
-      </div>
       {question && (
         <div
           className={classNames({
