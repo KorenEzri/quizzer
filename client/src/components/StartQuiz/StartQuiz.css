@@ -121,8 +121,8 @@
 .leaderboards__link:hover {
   -webkit-transition: 300ms;
   transition: 300ms;
-  background-color: #8bbd27;
-  color: #bac99c;
+  background-color: #9dc946;
+  color: #e7e7e7;
 }
 
 .leaderboards__link:active {

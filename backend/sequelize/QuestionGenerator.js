@@ -12,6 +12,7 @@ const QuestionSplitter = require("./QuestionSplitter");
 /////////////////////////////////////
 let correctAnswer;
 let currentQuestion;
+let storageHasQuestions = true;
 let round = 0;
 let userScore = 0;
 
@@ -70,6 +71,16 @@ const getQuestionFromDB = async (question) => {
 const generateQuestion = async () => {
   let questionForClient;
   let rawQuestion;
+  if (!storageHasQuestions) {
+    questionForClient = await generateRandomQuestion();
+    console.log(
+      "CORRECT: ",
+      correctAnswer,
+      "TYPE: ",
+      currentQuestion.question_type
+    );
+    return questionForClient;
+  }
   const {
     question,
     db,
@@ -80,6 +91,7 @@ const generateQuestion = async () => {
   if (db) {
     questionForClient = await getQuestionFromDB(rawQuestion);
   } else {
+    storageHasQuestions = false;
     questionForClient = await generateRandomQuestion();
   }
   console.log(

@@ -2,8 +2,9 @@ const SavedQuestions = require("./models/SavedQuestions");
 let questions;
 let totalAmountOfSavedQuestions = 0;
 let totalQuestionsAvailable = 0;
-let spentQuestions = [];
+let allQuestionRatingsCombined = 0;
 let round = 0;
+
 /////////////////////////////////////
 //  !!!!!!!     FLOW:     !!!!!!!
 /////////////////////////////////////
@@ -15,7 +16,7 @@ const calculateChancesAndGetQuestion = async () => {
   await calculateInitialData(round);
   let random = Math.random() * 100;
   let chance;
-  if ((totalQuestionsAvailable = 0)) {
+  if (totalQuestionsAvailable === 0) {
     chance = "!";
   }
   if (totalQuestionsAvailable < 100) {
@@ -25,14 +26,14 @@ const calculateChancesAndGetQuestion = async () => {
     chance = 70;
   }
   chance = 101;
-  if (random < chance && chance != "!" && totalQuestionsAvailable > 0) {
+  if (random < chance && chance !== "!" && totalQuestionsAvailable > 0) {
     return getQuestionFromDBstore();
   } else {
     return "!";
   }
 };
 // FUNC calculateInitialData() AS MENTIONED ABOVE
-const calculateInitialData = async (round) => {
+const calculateInitialData = async () => {
   if (round === 0) {
     questions = (await SavedQuestions.findAll({})).map((question, index) => {
       const { dataValues } = question;
@@ -50,10 +51,23 @@ const calculateInitialData = async (round) => {
 // MAKES SURE QUESTION IS NOT REPEATED - REMOVES CHOSEN QUESTION FROM TEMPORARY STORAGE
 const getQuestionFromDBstore = () => {
   console.log("getting question from storage.. ");
-  let question = getRandomElements(questions, 1)[0];
-  questions.splice(question.index);
+  allQuestionRatingsCombined = questions.reduce((prev, cur) => {
+    return prev + Number(cur.question.final_score);
+  }, 0);
+  assignChanceToEachElement(
+    questions,
+    "final_score",
+    allQuestionRatingsCombined,
+    "question"
+  );
+  let question = calculateOddsAndGetElement(questions, "chance");
+  questions = questions.filter((item) => item.index !== question.index);
   console.log("questions left in store: ", questions.length);
-  return { db: true, question };
+  if (question) {
+    return { db: true, question };
+  } else if (questions.length === 0) {
+    return { db: false };
+  }
 };
 // RESETS THE DATA FUNCTION calculateInitialData() SETS UP AT THE BEGINNING OF A GAME
 const resetDataAtGameStart = () => {
@@ -64,14 +78,64 @@ const resetDataAtGameStart = () => {
   questions = "";
   console.log("Initial DBquestions datavalues cleared!");
 };
-// GETS A RANDOM ELEMENT FROM AN ARRAY.
+// SELF EXPLANATORY FUNCTIONS.
+
+const assignChanceToEachElement = (
+  array,
+  relativeProperty,
+  totalDelimiter,
+  accessorProperty
+) => {
+  array.forEach((item) => {
+    const chance =
+      (item[accessorProperty][relativeProperty] / totalDelimiter) * 100;
+    item.chance = chance;
+  });
+};
 const getRandomElements = (array, n) => {
   let count = 0;
   let results = [];
   while (count < n) {
     results.push(array[Math.floor(Math.random() * array.length)]);
+    console.log(results);
     count++;
   }
-  return results;
+  return results[0];
+};
+const calculateOddsAndGetElement = (array, chanceProperty) => {
+  let chancedQuestions;
+  const random = Math.floor(Math.random() * 100);
+  switch (random) {
+    case 10:
+      chancedQuestions = array.filter((item) => item[chanceProperty] <= random);
+      return getRandomElements(chancedQuestions, 1);
+    case 20:
+      chancedQuestions = array.filter((item) => item[chanceProperty] <= random);
+      return getRandomElements(chancedQuestions, 1);
+    case 30:
+      chancedQuestions = array.filter((item) => item[chanceProperty] <= random);
+      return getRandomElements(chancedQuestions, 1);
+    case 40:
+      chancedQuestions = array.filter((item) => item[chanceProperty] <= random);
+      return getRandomElements(chancedQuestions, 1);
+    case 50:
+      chancedQuestions = array.filter((item) => item[chanceProperty] <= random);
+      return getRandomElements(chancedQuestions, 1);
+    case 60:
+      chancedQuestions = array.filter((item) => item[chanceProperty] <= random);
+      return getRandomElements(chancedQuestions, 1);
+    case 70:
+      chancedQuestions = array.filter((item) => item[chanceProperty] <= random);
+      return getRandomElements(chancedQuestions, 1);
+    case 80:
+      chancedQuestions = array.filter((item) => item[chanceProperty] <= random);
+      return getRandomElements(chancedQuestions, 1);
+    case 90:
+      chancedQuestions = array.filter((item) => item[chanceProperty] <= random);
+      return getRandomElements(chancedQuestions, 1);
+    default:
+      chancedQuestions = array.filter((item) => item[chanceProperty] <= random);
+      return getRandomElements(chancedQuestions, 1);
+  }
 };
 module.exports = { calculateChancesAndGetQuestion, resetDataAtGameStart };
