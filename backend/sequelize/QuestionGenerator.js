@@ -4,10 +4,9 @@ const Population = require("./models/Population"); // POPULATION COUNTS FOR COUN
 const IndependeceDays = require("./models/IndependenceDays"); // SELF EXPLANATORY
 const CountryList = require("./models/CountryList"); // SIMPLE LIST OF COUNTRIES THAT WORKS ACROSS ALL DATASETS
 const Capitals = require("./models/Capitals");
-const SavedQuestions = require("./models/SavedQuestions");
-const SendRating = require("./SendRating");
 const { Sequelize } = require("sequelize");
-
+const SendRating = require("./SendRating");
+const QuestionSplitter = require("./QuestionSplitter");
 /////////////////////////////////////
 //  !!!!!!!     FLOW:     !!!!!!!
 /////////////////////////////////////
@@ -25,63 +24,71 @@ const deepEqual = (x, y) => {
         ok(x).every((key) => deepEqual(x[key], y[key]))
     : x === y;
 };
-const determineQuestionSource = () => {
-  return "db";
-};
-const getQuestionFromDB = async () => {
-  const fullQuestion = getRandomElements(
-    await SavedQuestions.findAll({}),
-    1
-  )[0];
+const getQuestionFromDB = async (question) => {
   const choices = {
     falsies: [
       {
-        country: fullQuestion.choice_1_country,
-        data: fullQuestion.choice_1_data,
+        country: question.choice_1_country,
+        data: question.choice_1_data,
       },
       {
-        country: fullQuestion.choice_2_country,
-        data: fullQuestion.choice_2_data,
+        country: question.choice_2_country,
+        data: question.choice_2_data,
       },
       {
-        country: fullQuestion.choice_3_country,
-        data: fullQuestion.choice_3_data,
+        country: question.choice_3_country,
+        data: question.choice_3_data,
       },
     ],
     rightChoice: {
-      country: fullQuestion.choice_correct_country,
-      data: fullQuestion.choice_correct_data,
+      country: question.choice_correct_country,
+      data: question.choice_correct_data,
     },
   };
-  // if (choices.rightChoice.country == null) {
-  //   choices.rightChoice = choices.rightChoice.data || choices.rightChoice
-  // }
   correctAnswer = choices.rightChoice;
   currentQuestion = {
-    question: fullQuestion.question_full,
+    question: question.question_full,
     choices,
+    question_type: question.question_type,
   };
   const clientChoices = choices.falsies
     .concat([correctAnswer])
     .map((choice) => {
-      if (choice.country == null) return choice.data;
+      if (choice.country == null) {
+        return choice.data;
+      } else {
+        return choice;
+      }
     });
   const clientQuestion = {
-    question: fullQuestion.question_full,
+    question: question.question_full,
     choices: clientChoices,
+    type: question.question_type,
   };
   return clientQuestion;
 };
 const generateQuestion = async () => {
-  const source = determineQuestionSource();
-  let question;
-  if (source === "db") {
-    question = await getQuestionFromDB();
-  } else {
-    question = await generateRandomQuestion();
+  let questionForClient;
+  let rawQuestion;
+  const {
+    question,
+    db,
+  } = await QuestionSplitter.calculateChancesAndGetQuestion();
+  if (question) {
+    rawQuestion = question.question;
   }
-  console.log("CORRECT: ", correctAnswer);
-  return question;
+  if (db) {
+    questionForClient = await getQuestionFromDB(rawQuestion);
+  } else {
+    questionForClient = await generateRandomQuestion();
+  }
+  console.log(
+    "CORRECT: ",
+    correctAnswer,
+    "TYPE: ",
+    currentQuestion.question_type
+  );
+  return questionForClient;
 };
 const checkIfCorrect = (answer, difficulty) => {
   let score = userScore;
@@ -113,7 +120,6 @@ const checkIfCorrect = (answer, difficulty) => {
   } else {
     userScore = score - decrement;
   }
-  console.log("USER SCORE: ", userScore);
   return isCorrect;
 };
 const initRatingSequence = async (score) => {
@@ -123,7 +129,8 @@ const initRatingSequence = async (score) => {
   }
   await SendRating.triggerRatingSequence(score);
 };
-const handleGameEnd = async () => {
+const handleGameStart = async () => {
+  QuestionSplitter.resetDataAtGameStart();
   SendRating.receieveRatingRequest(null, null, null, null, "gameEnd");
   userScore = 0;
   round = 0;
@@ -162,11 +169,10 @@ const generateRandomQuestion = async () => {
   currentQuestion = questionBody;
   correctAnswer = questionBody.choices.rightChoice;
   clientQuestion = {
-    type: questionBody.type,
+    type: questionBody.question_type,
     question: questionBody.question,
     choices: questionBody.choices.falsies.concat([correctAnswer]),
   };
-  console.log("CORRECT:", correctAnswer);
   return clientQuestion;
 };
 // calls FUNC getRelevantQuestionParams() => SWITCH case
@@ -210,9 +216,12 @@ const getRelevantQuestionParams = async (reqs, template, list, ans_type) => {
     ans_type,
     relevantCountries
   );
+  if (!questionChoices.rightChoice) {
+    return await getRelevantQuestionParams();
+  }
   return {
     question: question,
-    type: determineQuestionType(reqs, ans_type),
+    question_type: determineQuestionType(reqs, ans_type),
     choices: questionChoices,
   };
 };
@@ -494,6 +503,6 @@ module.exports = {
   checkIfCorrect,
   verifyScores,
   getFullQuestionForRating,
-  handleGameEnd,
+  handleGameStart,
   initRatingSequence,
 };

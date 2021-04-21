@@ -30,7 +30,7 @@ questions.put("/answer", async (req, res) => {
 });
 
 questions.get("/end", async (req, res) => {
-  QuestionGenerator.handleGameEnd();
+  QuestionGenerator.handleGameStart();
   res.status(200).send("OK");
 });
 

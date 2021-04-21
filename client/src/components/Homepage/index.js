@@ -28,7 +28,6 @@ export default function Homepage() {
   const [showTimer, setShowTimer] = useState(false);
   const [score, setScore] = useState(0);
   const [difficulty, setDifficulty] = useState(1);
-  const [questionType, setQuestionType] = useState("");
   const [questionInterval, setQuestionInterval] = useState("");
   const [elapsedTime, setElapsedTime] = useState(0);
   const [startDate, setStartDate] = useState(0);
@@ -37,9 +36,9 @@ export default function Homepage() {
   const fetchQuestion = async (didClick) => {
     const { data } = await network.get(`${baseUrl}question`);
     setShowTimer(false);
-    dispatch(setCurrentQuestion(data.question));
+    const newQuestion = { question: data.question, type: data.type };
+    dispatch(setCurrentQuestion(newQuestion));
     dispatch(setCurrentChoices(data.choices));
-    setQuestionType(data.type);
     setShowTimer(true);
     if (!didClick) {
       dispatch(setQuestionsFailed(failed.failedCount));
@@ -140,7 +139,7 @@ export default function Homepage() {
           })}
         >
           <div className="question__container">
-            <Question question={question} />
+            <Question question={question.question} />
             <div className="scoreboard-container">
               {localStorage.getItem("anon")} <Score playerScore={score} />
             </div>
@@ -162,7 +161,7 @@ export default function Homepage() {
           <div className="choicebox-container">
             {!lostGame && (
               <ChoiceBox
-                questionType={questionType}
+                questionType={question.type}
                 difficulty={difficulty}
                 handleQuizStart={handleQuizStart}
               />

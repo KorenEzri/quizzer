@@ -20,10 +20,11 @@
 
 html {
   overflow-x: hidden;
+  overflow-y: hidden;
 }
 
 .scoreboard {
-  margin-top: 60px;
+  margin-top: 80px;
   border-collapse: collapse;
   display: table;
 }
@@ -80,14 +81,14 @@ html {
   border: none;
   border-radius: 4px;
   background-color: #eeeded;
-  margin-top: -45px;
+  margin-top: -65px;
 }
 
 .scoreboard__searchicon {
   position: absolute;
   padding-left: 2px;
   left: 34px;
-  top: -36px;
+  top: -56px;
   z-index: 9001;
 }
 
@@ -116,14 +117,39 @@ html {
 
 .table_row {
   background: #94bbe9;
-  background: -webkit-gradient(linear, left top, right top, color-stop(3%, #94bbe9), color-stop(88%, #74d663));
-  background: linear-gradient(90deg, #94bbe9 3%, #74d663 88%);
+  background: -webkit-gradient(linear, left top, right top, color-stop(3%, rgba(148, 188, 233, 0.877)), color-stop(88%, rgba(116, 214, 99, 0.856)));
+  background: linear-gradient(90deg, rgba(148, 188, 233, 0.877) 3%, rgba(116, 214, 99, 0.856) 88%);
 }
 
 .table__container {
   overflow-y: scroll;
-  height: 82vh;
+  height: 100vh;
   overflow-x: hidden;
+}
+
+.leader_homebtn {
+  padding-top: 90px;
+  margin-bottom: -133px;
+  background: #94bbe9;
+  background: -webkit-gradient(linear, left top, right top, color-stop(3%, rgba(148, 188, 233, 0.877)), color-stop(88%, rgba(116, 214, 99, 0.856)));
+  background: linear-gradient(90deg, rgba(148, 188, 233, 0.877) 3%, rgba(116, 214, 99, 0.856) 88%);
+}
+
+.leaderboard-home__link {
+  cursor: pointer;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  font-size: 0.8cm;
+  color: darkred;
+  -webkit-transition: 300ms;
+  transition: 300ms;
+  background-color: #a9e237;
+  padding: 5px;
+  border-radius: 6px;
+  margin-left: 45vw;
+  position: static;
 }
 
 .kaking {

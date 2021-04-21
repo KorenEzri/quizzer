@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import Board from "./Board";
-import history from "../../history";
 import network from "../../network";
 const baseUrl = "http://localhost:3001/api/leaderboards/getscores/";
 export default function Leaderboards() {
@@ -13,17 +12,5 @@ export default function Leaderboards() {
     })();
   }, []);
 
-  return (
-    <div>
-      {scoreData && <Board scores={scoreData} />}
-      <button
-        className="leaderboard-home__link"
-        onClick={(e) => {
-          history.push("/");
-        }}
-      >
-        Home
-      </button>
-    </div>
-  );
+  return <div>{scoreData && <Board scores={scoreData} />}</div>;
 }

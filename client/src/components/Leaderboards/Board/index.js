@@ -4,16 +4,8 @@ import Jdenticon from "react-jdenticon";
 import { useTable, useFilters } from "react-table";
 import SearchIcon from "@material-ui/icons/Search";
 import poopKING from "./poopking.png";
+import history from "../../../history";
 import "./Board.css";
-
-const getRandomColor = () => {
-  const letters = "0123456789ABCDEF";
-  let color = "#";
-  for (let i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 16)];
-  }
-  return color;
-};
 
 export default function Board({ scores }) {
   scores.sort(function (a, b) {
@@ -76,6 +68,16 @@ export default function Board({ scores }) {
 
   return (
     <div className="table__container">
+      <div className="absolutely leader_homebtn">
+        <button
+          className="leaderboard-home__link"
+          onClick={(e) => {
+            history.push("/");
+          }}
+        >
+          Home
+        </button>
+      </div>
       <table {...getTableProps()} className="scoreboard">
         <thead>
           <div className="absloutely">

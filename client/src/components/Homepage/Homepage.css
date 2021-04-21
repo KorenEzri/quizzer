@@ -463,25 +463,6 @@ html {
   background-color: #6c9124;
 }
 
-.leaderboard-home__link {
-  cursor: pointer;
-  -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
-  font-size: 0.8cm;
-  color: darkred;
-  -webkit-transition: 300ms;
-  transition: 300ms;
-  background-color: #a9e237;
-  padding: 5px;
-  border-radius: 6px;
-  margin-top: 60px;
-  height: 80px;
-  width: 300px;
-  margin-left: 40vw;
-}
-
 .leaderboard-home__link:hover {
   -webkit-transition: 300ms;
   transition: 300ms;

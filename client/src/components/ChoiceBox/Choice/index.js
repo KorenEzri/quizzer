@@ -75,7 +75,6 @@ export default function Choice({
       className="choicebox__choice"
       onClick={async ({ target }) => {
         const userAnswer = findFullChoice(target.textContent);
-        console.log(userAnswer);
         const { data } = await network.put(askIfCorrect, {
           answer: userAnswer,
           difficulty: difficulty,

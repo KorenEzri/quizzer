@@ -13,24 +13,50 @@ const getScore = (rating, credibility, check) => {
 const calculateCredibility = (rating, credibility) => {
   const { credibilityPoints, timeElapsed } = credibility;
 };
-const updateQuestionScorings = async (rawScore, scoreWithRates, question) => {
-  try {
-    SavedQuestions.increment(
-      {
-        concatinated_score: `+${rawScore}`,
-        concatinated_score_with_rates: `+${scoreWithRates}`,
-        final_score: `+${scoreWithRates / rawScore}`,
-      },
-      {
-        where: {
-          question_full: `${question}`,
+const updateQuestionScorings = async (
+  rawScore,
+  scoreWithRates,
+  question,
+  isNew
+) => {
+  if (isNew) {
+    try {
+      SavedQuestions.update(
+        {
+          concatinated_score: rawScore,
+          concatinated_score_with_rates: scoreWithRates,
+          final_score: scoreWithRates / rawScore,
         },
-      }
-    );
-  } catch ({ message }) {
-    console.log(
-      "ERROR in updatedQuestionScorings() at SendRating.js at ~line 23"
-    );
+        {
+          where: {
+            question_full: `${question}`,
+          },
+        }
+      );
+    } catch ({ message }) {
+      console.log(
+        "ERROR in updatedQuestionScorings() at SendRating.js at ~line 16"
+      );
+    }
+  } else {
+    try {
+      SavedQuestions.increment(
+        {
+          concatinated_score: `+${rawScore}`,
+          concatinated_score_with_rates: `+${scoreWithRates}`,
+          final_score: `+${scoreWithRates / rawScore}`,
+        },
+        {
+          where: {
+            question_full: `${question}`,
+          },
+        }
+      );
+    } catch ({ message }) {
+      console.log(
+        "ERROR in updatedQuestionScorings() at SendRating.js at ~line 23"
+      );
+    }
   }
 };
 const receieveRatingRequest = (
@@ -59,8 +85,8 @@ const triggerRatingSequence = async (currentPlayerFS) => {
   if (allRatingReqs.length === 0 || tag) {
     return "OK";
   }
+  tag = true;
   try {
-    tag = true;
     console.log(
       `Performing sequence on ${allRatingReqs.length} rating requests..`
     );
@@ -140,13 +166,13 @@ const saveRatings = async (
         score_5: getScore(rating, credibility, 5),
         last_rated_by: `${name}`,
         last_rating: rating,
+        question_type: fullQuestion.question_type,
       },
     });
     if (!created) {
       const {
         dataValues: { concatinated_score, concatinated_score_with_rates },
       } = savedQuestion;
-
       rawScore = concatinated_score + currentPlayerFS;
       scoreWithRates = concatinated_score_with_rates + rating * currentPlayerFS;
       savedQuestion.concatinated_score = rawScore;
@@ -163,7 +189,7 @@ const saveRatings = async (
     } else {
       rawScore = currentPlayerFS;
       scoreWithRates = currentPlayerFS * rating;
-      await updateQuestionScorings(rawScore, scoreWithRates, question);
+      await updateQuestionScorings(rawScore, scoreWithRates, question, "isNew");
     }
   } catch ({ message }) {
     console.log(
