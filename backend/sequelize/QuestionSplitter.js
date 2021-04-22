@@ -8,7 +8,6 @@ let round = 0;
 /////////////////////////////////////
 //  !!!!!!!     FLOW:     !!!!!!!
 /////////////////////////////////////
-
 // FUNC calculateChancesAndGetQuestion() - CALCS CHANCES OF DB QUESTION AND TRIGGERS
 // getQuestionFromDBstore() IF DB QUESTION CHANCE APPLIES
 // CALLS calculateInitialData() FIRST TO SET UP THE DATA CALCULATIONS ARE BASED ON
@@ -90,6 +89,7 @@ const assignChanceToEachElement = (
     const chance =
       (item[accessorProperty][relativeProperty] / totalDelimiter) * 100;
     item.chance = chance;
+    console.log("ITEM: ", item);
   });
 };
 const getRandomElements = (array, n) => {
@@ -97,44 +97,92 @@ const getRandomElements = (array, n) => {
   let results = [];
   while (count < n) {
     results.push(array[Math.floor(Math.random() * array.length)]);
-    console.log(results);
     count++;
   }
   return results[0];
 };
 const calculateOddsAndGetElement = (array, chanceProperty) => {
+  const maxChance = Math.ceil(
+    Math.max.apply(
+      Math,
+      array.map(function (o) {
+        return o[chanceProperty];
+      })
+    ) / 10
+  );
+  const minChance = Math.ceil(
+    Math.min.apply(
+      Math,
+      array.map(function (o) {
+        return o[chanceProperty];
+      })
+    ) / 10
+  );
+  console.log("MINCHANCE: ", minChance, "maxChanc:", maxChance);
   let chancedQuestions;
-  const random = Math.floor(Math.random() * 100);
+  const random =
+    Math.floor(Math.random() * (maxChance - minChance + 1) + minChance) * 10;
   switch (random) {
     case 10:
-      chancedQuestions = array.filter((item) => item[chanceProperty] <= random);
+      console.log("CHANCE 10");
+      chancedQuestions = array.filter((item) => item[chanceProperty] < random);
       return getRandomElements(chancedQuestions, 1);
     case 20:
-      chancedQuestions = array.filter((item) => item[chanceProperty] <= random);
+      console.log("CHANCE 20");
+      chancedQuestions = array.filter(
+        (item) => item[chanceProperty] <= random && item[chanceProperty] > 10
+      );
       return getRandomElements(chancedQuestions, 1);
     case 30:
-      chancedQuestions = array.filter((item) => item[chanceProperty] <= random);
+      console.log("CHANCE 30");
+      chancedQuestions = array.filter(
+        (item) => item[chanceProperty] <= random && item[chanceProperty] > 20
+      );
       return getRandomElements(chancedQuestions, 1);
     case 40:
-      chancedQuestions = array.filter((item) => item[chanceProperty] <= random);
+      console.log("CHANCE 40");
+      chancedQuestions = array.filter(
+        (item) => item[chanceProperty] <= random && item[chanceProperty] > 30
+      );
       return getRandomElements(chancedQuestions, 1);
     case 50:
-      chancedQuestions = array.filter((item) => item[chanceProperty] <= random);
+      console.log("CHANCE 50");
+      chancedQuestions = array.filter((item) => {
+        return item[chanceProperty] <= random && item[chanceProperty] > 40;
+      });
       return getRandomElements(chancedQuestions, 1);
     case 60:
-      chancedQuestions = array.filter((item) => item[chanceProperty] <= random);
+      console.log("CHANCE 60");
+      chancedQuestions = array.filter(
+        (item) => item[chanceProperty] <= random && item[chanceProperty] > 50
+      );
       return getRandomElements(chancedQuestions, 1);
     case 70:
-      chancedQuestions = array.filter((item) => item[chanceProperty] <= random);
+      console.log("CHANCE 70");
+      chancedQuestions = array.filter(
+        (item) => item[chanceProperty] <= random && item[chanceProperty] > 60
+      );
       return getRandomElements(chancedQuestions, 1);
     case 80:
-      chancedQuestions = array.filter((item) => item[chanceProperty] <= random);
+      console.log("CHANCE 80");
+      chancedQuestions = array.filter(
+        (item) => item[chanceProperty] <= random && item[chanceProperty] > 70
+      );
       return getRandomElements(chancedQuestions, 1);
     case 90:
-      chancedQuestions = array.filter((item) => item[chanceProperty] <= random);
+      console.log("CHANCE 90");
+      chancedQuestions = array.filter(
+        (item) => item[chanceProperty] <= random && item[chanceProperty] > 80
+      );
       return getRandomElements(chancedQuestions, 1);
     default:
-      chancedQuestions = array.filter((item) => item[chanceProperty] <= random);
+      console.log("CHANCE > 90");
+      if (array.length === 1) {
+        return array[0];
+      }
+      chancedQuestions = array.filter((item) => {
+        return item[chanceProperty] < -random && item[chanceProperty > 90];
+      });
       return getRandomElements(chancedQuestions, 1);
   }
 };
