@@ -142,10 +142,11 @@ const initRatingSequence = async (score) => {
   await SendRating.triggerRatingSequence(score);
 };
 const handleGameStart = async () => {
-  QuestionSplitter.resetDataAtGameStart();
+  await QuestionSplitter.resetDataAtGameStart();
   SendRating.receieveRatingRequest(null, null, null, null, "gameEnd");
   userScore = 0;
   round = 0;
+  storageHasQuestions = true;
   correctAnswer = "";
   currentQuestion = "";
 };

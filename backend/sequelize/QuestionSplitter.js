@@ -24,7 +24,6 @@ const calculateChancesAndGetQuestion = async () => {
   if (totalQuestionsAvailable >= 100) {
     chance = 70;
   }
-  chance = 101;
   if (random < chance && chance !== "!" && totalQuestionsAvailable > 0) {
     return getQuestionFromDBstore();
   } else {
@@ -60,6 +59,9 @@ const getQuestionFromDBstore = () => {
     "question"
   );
   let question = calculateOddsAndGetElement(questions, "chance");
+  if (!question) {
+    question = calculateOddsAndGetElement(questions, "chance");
+  }
   questions = questions.filter((item) => item.index !== question.index);
   console.log("questions left in store: ", questions.length);
   if (question) {
@@ -69,16 +71,15 @@ const getQuestionFromDBstore = () => {
   }
 };
 // RESETS THE DATA FUNCTION calculateInitialData() SETS UP AT THE BEGINNING OF A GAME
-const resetDataAtGameStart = () => {
+const resetDataAtGameStart = async () => {
   totalAmountOfSavedQuestions = 0;
   totalQuestionsAvailable = 0;
-  spentQuestions = [];
+  allQuestionRatingsCombined = 0;
   round = 0;
   questions = "";
-  console.log("Initial DBquestions datavalues cleared!");
+  await calculateInitialData();
 };
 // SELF EXPLANATORY FUNCTIONS.
-
 const assignChanceToEachElement = (
   array,
   relativeProperty,
@@ -89,7 +90,6 @@ const assignChanceToEachElement = (
     const chance =
       (item[accessorProperty][relativeProperty] / totalDelimiter) * 100;
     item.chance = chance;
-    console.log("ITEM: ", item);
   });
 };
 const getRandomElements = (array, n) => {
@@ -118,72 +118,91 @@ const calculateOddsAndGetElement = (array, chanceProperty) => {
       })
     ) / 10
   );
-  console.log("MINCHANCE: ", minChance, "maxChanc:", maxChance);
   let chancedQuestions;
-  const random =
-    Math.floor(Math.random() * (maxChance - minChance + 1) + minChance) * 10;
-  switch (random) {
-    case 10:
-      console.log("CHANCE 10");
-      chancedQuestions = array.filter((item) => item[chanceProperty] < random);
-      return getRandomElements(chancedQuestions, 1);
-    case 20:
-      console.log("CHANCE 20");
-      chancedQuestions = array.filter(
-        (item) => item[chanceProperty] <= random && item[chanceProperty] > 10
-      );
-      return getRandomElements(chancedQuestions, 1);
-    case 30:
-      console.log("CHANCE 30");
-      chancedQuestions = array.filter(
-        (item) => item[chanceProperty] <= random && item[chanceProperty] > 20
-      );
-      return getRandomElements(chancedQuestions, 1);
-    case 40:
-      console.log("CHANCE 40");
-      chancedQuestions = array.filter(
-        (item) => item[chanceProperty] <= random && item[chanceProperty] > 30
-      );
-      return getRandomElements(chancedQuestions, 1);
-    case 50:
-      console.log("CHANCE 50");
-      chancedQuestions = array.filter((item) => {
-        return item[chanceProperty] <= random && item[chanceProperty] > 40;
-      });
-      return getRandomElements(chancedQuestions, 1);
-    case 60:
-      console.log("CHANCE 60");
-      chancedQuestions = array.filter(
-        (item) => item[chanceProperty] <= random && item[chanceProperty] > 50
-      );
-      return getRandomElements(chancedQuestions, 1);
-    case 70:
-      console.log("CHANCE 70");
-      chancedQuestions = array.filter(
-        (item) => item[chanceProperty] <= random && item[chanceProperty] > 60
-      );
-      return getRandomElements(chancedQuestions, 1);
-    case 80:
-      console.log("CHANCE 80");
-      chancedQuestions = array.filter(
-        (item) => item[chanceProperty] <= random && item[chanceProperty] > 70
-      );
-      return getRandomElements(chancedQuestions, 1);
-    case 90:
-      console.log("CHANCE 90");
-      chancedQuestions = array.filter(
-        (item) => item[chanceProperty] <= random && item[chanceProperty] > 80
-      );
-      return getRandomElements(chancedQuestions, 1);
-    default:
-      console.log("CHANCE > 90");
-      if (array.length === 1) {
-        return array[0];
-      }
-      chancedQuestions = array.filter((item) => {
-        return item[chanceProperty] < -random && item[chanceProperty > 90];
-      });
-      return getRandomElements(chancedQuestions, 1);
+  const random = Math.floor(
+    Math.random() * (maxChance - minChance + 1) + minChance
+  );
+  console.log(random);
+  if (random < 5) {
+    // 50% chance
+    chancedQuestions = array.filter((item) => item[chanceProperty] <= 50);
+    return getRandomElements(chancedQuestions, 1);
+  } else if (random < 7) {
+    // 20% chance
+    chancedQuestions = array.filter((item) => item[chanceProperty] <= 20);
+    return getRandomElements(chancedQuestions, 1);
+  } else if (random < 9) {
+    // 30% chance
+    chancedQuestions = array.filter((item) => item[chanceProperty] <= 30);
+    return getRandomElements(chancedQuestions, 1);
+  } else {
+    chancedQuestions = array.filter((item) => item[chanceProperty] > 90);
+    return getRandomElements(chancedQuestions, 1);
   }
+
+  // const random = Math.floor(Math.random() * (10 - 1 + 1) + minChance) * 10;
+  // switch (random) {
+  //   case 10:
+  //     console.log("CHANCE 10");
+  //     chancedQuestions = array.filter((item) => item[chanceProperty] < random);
+  //     return getRandomElements(chancedQuestions, 1);
+  //   case 20:
+  //     console.log("CHANCE 20");
+  // chancedQuestions = array.filter(
+  //   (item) => item[chanceProperty] <= random && item[chanceProperty] > 10
+  // );
+  // return getRandomElements(chancedQuestions, 1);
+  //   case 30:
+  //     console.log("CHANCE 30");
+  //     chancedQuestions = array.filter(
+  //       (item) => item[chanceProperty] <= random && item[chanceProperty] > 20
+  //     );
+  //     return getRandomElements(chancedQuestions, 1);
+  //   case 40:
+  //     console.log("CHANCE 40");
+  //     chancedQuestions = array.filter(
+  //       (item) => item[chanceProperty] <= random && item[chanceProperty] > 30
+  //     );
+  //     return getRandomElements(chancedQuestions, 1);
+  //   case 50:
+  //     console.log("CHANCE 50");
+  //     chancedQuestions = array.filter((item) => {
+  //       return item[chanceProperty] <= random && item[chanceProperty] > 40;
+  //     });
+  //     return getRandomElements(chancedQuestions, 1);
+  //   case 60:
+  //     console.log("CHANCE 60");
+  //     chancedQuestions = array.filter(
+  //       (item) => item[chanceProperty] <= random && item[chanceProperty] > 50
+  //     );
+  //     return getRandomElements(chancedQuestions, 1);
+  //   case 70:
+  //     console.log("CHANCE 70");
+  //     chancedQuestions = array.filter(
+  //       (item) => item[chanceProperty] <= random && item[chanceProperty] > 60
+  //     );
+  //     return getRandomElements(chancedQuestions, 1);
+  //   case 80:
+  //     console.log("CHANCE 80");
+  //     chancedQuestions = array.filter(
+  //       (item) => item[chanceProperty] <= random && item[chanceProperty] > 70
+  //     );
+  //     return getRandomElements(chancedQuestions, 1);
+  //   case 90:
+  //     console.log("CHANCE 90");
+  //     chancedQuestions = array.filter(
+  //       (item) => item[chanceProperty] <= random && item[chanceProperty] > 80
+  //     );
+  //     return getRandomElements(chancedQuestions, 1);
+  //   default:
+  //     console.log("CHANCE > 90");
+  //     if (array.length === 1) {
+  //       return array[0];
+  //     }
+  //     chancedQuestions = array.filter((item) => {
+  //       return item[chanceProperty] < -random && item[chanceProperty > 90];
+  //     });
+  //     return getRandomElements(chancedQuestions, 1);
+  // }
 };
 module.exports = { calculateChancesAndGetQuestion, resetDataAtGameStart };
