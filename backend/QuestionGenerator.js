@@ -32,7 +32,7 @@ const getQuestionFromDB = async (question) => {
     falsies: [
       {
         country: question.choiceOneCountry,
-        data: question.choiceOnedata,
+        data: question.choiceOneData,
       },
       {
         country: question.choiceTwoCountry,
@@ -190,7 +190,6 @@ const generateRandomQuestion = async () => {
     question: questionBody.question,
     choices: questionBody.choices.falsies.concat([correctAnswer]),
   };
-
   return clientQuestion;
 };
 // calls FUNC getRelevantQuestionParams() => SWITCH case

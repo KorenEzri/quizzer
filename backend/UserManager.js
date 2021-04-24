@@ -2,7 +2,9 @@ const sequelize = require("./sequelize");
 const DataTypes = require("sequelize/lib/data-types");
 const AnonUsers = require("./models/anonusers")(sequelize, DataTypes);
 const QuestionGenerator = require("./QuestionGenerator");
-
+const findAllusers = async () => {
+  return await AnonUsers.findAll({});
+};
 const createAnonUser = async (user) => {
   try {
     const [newAnon, created] = await AnonUsers.findOrCreate({
@@ -86,4 +88,4 @@ const updateHighscore = async (score, user, elapsedTime) => {
   }
 };
 
-module.exports = { createAnonUser, updateHighscore };
+module.exports = { createAnonUser, updateHighscore, findAllusers };

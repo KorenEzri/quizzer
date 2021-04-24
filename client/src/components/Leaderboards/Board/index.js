@@ -7,6 +7,16 @@ import poopKING from "./poopking.png";
 import history from "../../../history";
 import "./Board.css";
 
+const getPrettyDate = (date) => {
+  date = new Date(date);
+  let year = date.getFullYear();
+  let month = (1 + date.getMonth()).toString();
+  month = month.length > 1 ? month : "0" + month;
+  let day = date.getDate().toString();
+  day = day.length > 1 ? day : "0" + day;
+  return month + "/" + day + "/" + year;
+};
+
 export default function Board({ scores }) {
   scores.sort(function (a, b) {
     return b.highscore - a.highscore;
@@ -18,8 +28,8 @@ export default function Board({ scores }) {
         return {
           player: user.name,
           highscore: hs,
-          joined: user.createdAt,
-          at: user.highscore_date,
+          joined: getPrettyDate(user.createdAt),
+          at: getPrettyDate(user.highscoreDate),
           index: index,
         };
       }),

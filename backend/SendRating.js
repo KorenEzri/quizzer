@@ -1,7 +1,7 @@
 const sequelize = require("./sequelize");
 const DataTypes = require("sequelize/lib/data-types");
-const SavedQuestions = require("./models/questions")(sequelize, DataTypes);
 const AnonUsers = require("./models/AnonUsers")(sequelize, DataTypes);
+const SavedQuestions = require("./models/questions")(sequelize, DataTypes);
 const allRatingReqs = [];
 let tag = false;
 const getScore = (rating, credibility, check) => {
@@ -82,6 +82,7 @@ const receieveRatingRequest = (
   };
   allRatingReqs.push(ratingRequest);
   console.log("RATING CACHE REQUEST RECEIVED AND SAVED");
+  console.log(fullQuestion);
 };
 const triggerRatingSequence = async (currentPlayerFS) => {
   if (allRatingReqs.length === 0 || tag) {
@@ -165,7 +166,7 @@ const saveRatings = async (
           ? falsyChoices[2].data
           : falsyChoices[2] || null,
         choiceCorrectCountry: choices.rightChoice.country,
-        choiceCorrectData: choices.rightChoice
+        choiceCorrectData: choices.rightChoice.data
           ? choices.rightChoice.data
           : choices.rightChoice,
         scoreOne: getScore(rating, credibility, 1),
