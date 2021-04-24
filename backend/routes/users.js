@@ -1,5 +1,5 @@
 const { Router } = require("express");
-const UserManager = require("../sequelize/UserManager");
+const UserManager = require("../UserManager");
 const users = Router();
 
 users.post("/createanon", async (req, res) => {

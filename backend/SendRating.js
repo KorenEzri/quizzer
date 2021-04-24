@@ -1,5 +1,7 @@
-const SavedQuestions = require("../sequelize/models/SavedQuestions");
-const AnonUsers = require("./models/AnonUsers");
+const sequelize = require("./sequelize");
+const DataTypes = require("sequelize/lib/data-types");
+const SavedQuestions = require("./models/questions")(sequelize, DataTypes);
+const AnonUsers = require("./models/AnonUsers")(sequelize, DataTypes);
 const allRatingReqs = [];
 let tag = false;
 const getScore = (rating, credibility, check) => {
@@ -23,13 +25,13 @@ const updateQuestionScorings = async (
     try {
       SavedQuestions.update(
         {
-          concatinated_score: rawScore,
-          concatinated_score_with_rates: scoreWithRates,
-          final_score: scoreWithRates / rawScore,
+          concatinatedScore: rawScore,
+          concatinatedScoreWithRates: scoreWithRates,
+          finalScore: scoreWithRates / rawScore,
         },
         {
           where: {
-            question_full: `${question}`,
+            questionFull: `${question}`,
           },
         }
       );
@@ -42,13 +44,13 @@ const updateQuestionScorings = async (
     try {
       SavedQuestions.increment(
         {
-          concatinated_score: `+${rawScore}`,
-          concatinated_score_with_rates: `+${scoreWithRates}`,
-          final_score: `+${scoreWithRates / rawScore}`,
+          concatinatedScore: `+${rawScore}`,
+          concatinatedScoreWithRates: `+${scoreWithRates}`,
+          finalScore: `+${scoreWithRates / rawScore}`,
         },
         {
           where: {
-            question_full: `${question}`,
+            questionFull: `${question}`,
           },
         }
       );
@@ -133,7 +135,7 @@ const saveRatings = async (
   try {
     AnonUsers.update(
       {
-        last_rating: rating,
+        lastRating: rating,
       },
       {
         where: {
@@ -147,44 +149,44 @@ const saveRatings = async (
 
   try {
     const [savedQuestion, created] = await SavedQuestions.findOrCreate({
-      where: { question_full: `${question}` },
+      where: { questionFull: `${question}` },
       defaults: {
-        question_id: 0,
-        question_template: null,
-        question_full: question,
-        choice_1_country: falsyChoices[0].country || null,
-        choice_1_data: falsyChoices[0].data || falsyChoices[0],
-        choice_2_country: falsyChoices[1] ? falsyChoices[1].country : null,
-        choice_2_data: falsyChoices[1]
+        id: 0,
+        questionTemplate: null,
+        questionFull: question,
+        choiceOneCountry: falsyChoices[0].country || null,
+        choiceOneData: falsyChoices[0].data || falsyChoices[0],
+        choiceTwoCountry: falsyChoices[1] ? falsyChoices[1].country : null,
+        choiceTwoData: falsyChoices[1]
           ? falsyChoices[1].data
           : falsyChoices[1] || null,
-        choice_3_country: falsyChoices[2] ? falsyChoices[2].country : null,
-        choice_3_data: falsyChoices[2]
+        choiceThreeCountry: falsyChoices[2] ? falsyChoices[2].country : null,
+        choiceThreeData: falsyChoices[2]
           ? falsyChoices[2].data
           : falsyChoices[2] || null,
-        choice_correct_country: choices.rightChoice.country,
-        choice_correct_data: choices.rightChoice
+        choiceCorrectCountry: choices.rightChoice.country,
+        choiceCorrectData: choices.rightChoice
           ? choices.rightChoice.data
           : choices.rightChoice,
-        score_1: getScore(rating, credibility, 1),
-        score_2: getScore(rating, credibility, 2),
-        score_3: getScore(rating, credibility, 3),
-        score_4: getScore(rating, credibility, 4),
-        score_5: getScore(rating, credibility, 5),
-        last_rated_by: `${name}`,
-        last_rating: rating,
-        question_type: fullQuestion.question_type,
+        scoreOne: getScore(rating, credibility, 1),
+        scoreTwo: getScore(rating, credibility, 2),
+        scoreThree: getScore(rating, credibility, 3),
+        scoreFour: getScore(rating, credibility, 4),
+        scoreFive: getScore(rating, credibility, 5),
+        lastRatedBy: `${name}`,
+        lastRating: rating,
+        questionType: fullQuestion.question_type,
       },
     });
     if (!created) {
       const {
-        dataValues: { concatinated_score, concatinated_score_with_rates },
+        dataValues: { concatinatedScore, concatinatedScoreWithRates },
       } = savedQuestion;
-      rawScore = concatinated_score + currentPlayerFS;
-      scoreWithRates = concatinated_score_with_rates + rating * currentPlayerFS;
-      savedQuestion.concatinated_score = rawScore;
-      savedQuestion.concatinated_score_with_rates = scoreWithRates;
-      savedQuestion.final_score = scoreWithRates / rawScore;
+      rawScore = concatinatedScore + currentPlayerFS;
+      scoreWithRates = concatinatedScoreWithRates + rating * currentPlayerFS;
+      savedQuestion.concatinatedScore = rawScore;
+      savedQuestion.concatinatedScoreWithRates = scoreWithRates;
+      savedQuestion.finalScore = scoreWithRates / rawScore;
       try {
         await savedQuestion.save();
       } catch ({ message }) {

@@ -1,5 +1,5 @@
 const { Router } = require("express");
-const QuestionGenerator = require("../sequelize/QuestionGenerator");
+const QuestionGenerator = require("../QuestionGenerator");
 const questions = Router();
 
 questions.get("/question", async (req, res) => {

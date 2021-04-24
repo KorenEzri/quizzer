@@ -1,9 +1,11 @@
-const Template = require("./models/Template"); // QUESTION TEMPLATES
-const Countries = require("./models/Countries"); // COUNTRY DATA - RATES, REGIONS, ETC
-const Population = require("./models/Population"); // POPULATION COUNTS FOR COUNTRIES
-const IndependeceDays = require("./models/IndependenceDays"); // SELF EXPLANATORY
-const CountryList = require("./models/CountryList"); // SIMPLE LIST OF COUNTRIES THAT WORKS ACROSS ALL DATASETS
-const Capitals = require("./models/Capitals");
+const sequelize = require("./sequelize");
+const DataTypes = require("sequelize/lib/data-types");
+const Template = require("./models/questiontemplates")(sequelize, DataTypes); // QUESTION TEMPLATES
+const Countries = require("./models/countrydata")(sequelize, DataTypes); // COUNTRY DATA - RATES, REGIONS, ETC
+const IndependeceDays = require("./models/independencedays")(
+  sequelize,
+  DataTypes
+); // SELF EXPLANATORY
 const { Sequelize } = require("sequelize");
 const SendRating = require("./SendRating");
 const QuestionSplitter = require("./QuestionSplitter");
@@ -29,28 +31,28 @@ const getQuestionFromDB = async (question) => {
   const choices = {
     falsies: [
       {
-        country: question.choice_1_country,
-        data: question.choice_1_data,
+        country: question.choiceOneCountry,
+        data: question.choiceOnedata,
       },
       {
-        country: question.choice_2_country,
-        data: question.choice_2_data,
+        country: question.choiceTwoCountry,
+        data: question.choiceTwoData,
       },
       {
-        country: question.choice_3_country,
-        data: question.choice_3_data,
+        country: question.choiceThreeCountry,
+        data: question.choiceThreeData,
       },
     ],
     rightChoice: {
-      country: question.choice_correct_country,
-      data: question.choice_correct_data,
+      country: question.choiceCorrectCountry,
+      data: question.choiceCorrectData,
     },
   };
   correctAnswer = choices.rightChoice;
   currentQuestion = {
-    question: question.question_full,
+    question: question.questionFull,
     choices,
-    question_type: question.question_type,
+    question_type: question.questionType,
   };
   const clientChoices = choices.falsies
     .concat([correctAnswer])
@@ -62,9 +64,9 @@ const getQuestionFromDB = async (question) => {
       }
     });
   const clientQuestion = {
-    question: question.question_full,
+    question: question.questionFull,
     choices: clientChoices,
-    type: question.question_type,
+    type: question.questionType,
   };
   return clientQuestion;
 };
@@ -165,7 +167,7 @@ const getFullQuestionForRating = () => {
 // FUNC generateRandomQuestion() => gets random question template and random country names
 const generateRandomQuestion = async () => {
   const allCountries = shuffleArray(
-    await CountryList.findAll({
+    await Countries.findAll({
       attributes: [
         Sequelize.fn("DISTINCT", Sequelize.col("Country")),
         "Country",
@@ -174,12 +176,12 @@ const generateRandomQuestion = async () => {
   );
   const templates = await Template.findAll();
   const randomTemplate = getRandomElements(templates, 1);
-  const { template_reqs, template, template_ans_type } = randomTemplate[0];
+  const { templateReqs, template, templateAnsType } = randomTemplate[0];
   const questionBody = await getRelevantQuestionParams(
-    template_reqs,
+    templateReqs,
     template,
     allCountries,
-    template_ans_type
+    templateAnsType
   );
   currentQuestion = questionBody;
   correctAnswer = questionBody.choices.rightChoice;
@@ -269,7 +271,7 @@ const getRelevantQuestionChoices = async (ans_type, countries) => {
 const getPopulationQCs = async (countries) => {
   const popsByCountries = await Promise.all(
     countries.map(async ({ Country }) => {
-      const popCount = await Population.findAll({
+      const popCount = await Countries.findAll({
         attributes: [
           Sequelize.fn("DISTINCT", Sequelize.col("Population")),
           "Population",
@@ -291,8 +293,8 @@ const getSizeQCs = async (countries) => {
     countries.map(async ({ Country }) => {
       const CountrySize = await Countries.findAll({
         attributes: [
-          Sequelize.fn("DISTINCT", Sequelize.col("Area_sq_mi")),
-          "Area_sq_mi",
+          Sequelize.fn("DISTINCT", Sequelize.col("AreaSqMi")),
+          "AreaSqMi",
         ],
         where: {
           Country: `${Country.trim()}`,
@@ -300,19 +302,20 @@ const getSizeQCs = async (countries) => {
       });
       return {
         country: Country.trim(),
-        data: CountrySize[0].dataValues.Area_sq_mi,
+        data: CountrySize[0].dataValues.AreaSqMi,
       };
     })
   );
   return generateNumericChoices(countrySizeInSqKm);
 };
 const getRateQCs = async (countries, birthOrDeath) => {
+  const birthDeath = birthOrDeath.toLowerCase();
   const ratesByCountry = await Promise.all(
     countries.map(async ({ Country }) => {
       const birthOrDeathRate = await Countries.findAll({
         attributes: [
-          Sequelize.fn("DISTINCT", Sequelize.col(`${birthOrDeath}`)),
-          `${birthOrDeath}`,
+          Sequelize.fn("DISTINCT", Sequelize.col(`${birthDeath}`)),
+          `${birthDeath}`,
         ],
         where: {
           Country: `${Country.trim()}`,
@@ -320,7 +323,7 @@ const getRateQCs = async (countries, birthOrDeath) => {
       });
       return {
         country: Country.trim(),
-        data: birthOrDeathRate[0].dataValues[birthOrDeath],
+        data: birthOrDeathRate[0].dataValues[birthDeath],
       };
     })
   );
@@ -331,8 +334,8 @@ const getAut_DateQCs = async (countries) => {
     countries.map(async ({ Country }) => {
       const independeceDays = await IndependeceDays.findAll({
         attributes: [
-          Sequelize.fn("DISTINCT", Sequelize.col("Year_celebrated")),
-          "Year_celebrated",
+          Sequelize.fn("DISTINCT", Sequelize.col("dateOfHoliday")),
+          "dateOfHoliday",
         ],
         where: {
           Country: ` ${Country.trim()}`,
@@ -340,7 +343,7 @@ const getAut_DateQCs = async (countries) => {
       });
       return {
         country: Country.trim(),
-        data: independeceDays[0].dataValues.Year_celebrated,
+        data: independeceDays[0].dataValues.dateOfHoliday,
       };
     })
   );
@@ -349,10 +352,10 @@ const getAut_DateQCs = async (countries) => {
 const getCapitalQCs = async (countries) => {
   const capitalsByCountry = await Promise.all(
     countries.map(async ({ Country }) => {
-      const capitals = await Capitals.findAll({
+      const capitals = await Countries.findAll({
         attributes: [
-          Sequelize.fn("DISTINCT", Sequelize.col("CapitalName")),
-          "CapitalName",
+          Sequelize.fn("DISTINCT", Sequelize.col("capitalName")),
+          "capitalName",
         ],
         where: {
           Country: `${Country.trim()}`,
@@ -360,7 +363,7 @@ const getCapitalQCs = async (countries) => {
       });
       return {
         country: Country.trim(),
-        data: capitals[0].dataValues.CapitalName,
+        data: capitals[0].dataValues.capitalName,
       };
     })
   );
@@ -391,10 +394,10 @@ const getRegionalQCs = async (countries) => {
 const getContinentQCs = async (countries) => {
   const continentsByCountry = await Promise.all(
     countries.map(async ({ Country }) => {
-      const continents = await Capitals.findAll({
+      const continents = await Countries.findAll({
         attributes: [
-          Sequelize.fn("DISTINCT", Sequelize.col("ContinentName")),
-          "ContinentName",
+          Sequelize.fn("DISTINCT", Sequelize.col("continentName")),
+          "continentName",
         ],
         where: {
           Country: `${Country.trim()}`,
@@ -402,7 +405,7 @@ const getContinentQCs = async (countries) => {
       });
       return {
         country: Country.trim(),
-        data: continents[0].dataValues.ContinentName,
+        data: continents[0].dataValues.continentName,
       };
     })
   );

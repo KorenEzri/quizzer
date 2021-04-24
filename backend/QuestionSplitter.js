@@ -1,5 +1,7 @@
-const SavedQuestions = require("./models/SavedQuestions");
-let questions;
+const sequelize = require("./sequelize");
+const DataTypes = require("sequelize/lib/data-types");
+const questions = require("./models/questions")(sequelize, DataTypes);
+let savedQuestions;
 let totalAmountOfSavedQuestions = 0;
 let totalQuestionsAvailable = 0;
 let allQuestionRatingsCombined = 0;
@@ -15,7 +17,7 @@ const calculateChancesAndGetQuestion = async () => {
   await calculateInitialData(round);
   let random = Math.random() * 100;
   let chance;
-  if (questions.length) totalQuestionsAvailable = questions.length;
+  if (savedQuestions.length) totalQuestionsAvailable = savedQuestions.length;
   if (totalQuestionsAvailable === 0) {
     console.log("no questions in storage");
     chance = "!";
@@ -37,14 +39,14 @@ const calculateChancesAndGetQuestion = async () => {
 // FUNC calculateInitialData() AS MENTIONED ABOVE
 const calculateInitialData = async () => {
   if (round === 0) {
-    questions = (await SavedQuestions.findAll({})).map((question, index) => {
+    savedQuestions = (await questions.findAll({})).map((question, index) => {
       const { dataValues } = question;
       return {
         question: dataValues,
         index,
       };
     });
-    totalAmountOfSavedQuestions = questions.length;
+    totalAmountOfSavedQuestions = savedQuestions.length;
     totalQuestionsAvailable = totalAmountOfSavedQuestions;
     round++;
   } else return;
@@ -53,24 +55,26 @@ const calculateInitialData = async () => {
 // MAKES SURE QUESTION IS NOT REPEATED - REMOVES CHOSEN QUESTION FROM TEMPORARY STORAGE
 const getQuestionFromDBstore = () => {
   console.log("getting question from storage.. ");
-  allQuestionRatingsCombined = questions.reduce((prev, cur) => {
-    return prev + Number(cur.question.final_score);
+  allQuestionRatingsCombined = savedQuestions.reduce((prev, cur) => {
+    return prev + Number(cur.question.finalScore);
   }, 0);
   assignChanceToEachElement(
-    questions,
-    "final_score",
+    savedQuestions,
+    "finalScore",
     allQuestionRatingsCombined,
     "question"
   );
-  let question = calculateOddsAndGetElement(questions, "chance");
+  let question = calculateOddsAndGetElement(savedQuestions, "chance");
   if (!question) {
-    question = calculateOddsAndGetElement(questions, "chance");
+    question = calculateOddsAndGetElement(savedQuestions, "chance");
   }
-  questions = questions.filter((item) => item.index !== question.index);
-  console.log("questions left in store: ", questions.length);
+  savedQuestions = savedQuestions.filter(
+    (item) => item.index !== question.index
+  );
+  console.log("questions left in store: ", savedQuestions.length);
   if (question) {
     return { db: true, question };
-  } else if (questions.length === 0) {
+  } else if (savedQuestions.length === 0) {
     return { db: "empty" };
   }
 };
@@ -80,7 +84,7 @@ const resetDataAtGameStart = async () => {
   totalQuestionsAvailable = 0;
   allQuestionRatingsCombined = 0;
   round = 0;
-  questions = "";
+  savedQuestions = "";
   await calculateInitialData();
 };
 // SELF EXPLANATORY FUNCTIONS.

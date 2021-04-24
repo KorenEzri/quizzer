@@ -1,13 +1,13 @@
-const AnonUsers = require("../sequelize/models/AnonUsers");
+const sequelize = require("./sequelize");
+const DataTypes = require("sequelize/lib/data-types");
+const AnonUsers = require("./models/anonusers")(sequelize, DataTypes);
 const QuestionGenerator = require("./QuestionGenerator");
-const sequelize = require("../sequelize/sequelize");
-const users = require("../routes/users");
 
 const createAnonUser = async (user) => {
   try {
     const [newAnon, created] = await AnonUsers.findOrCreate({
       where: { name: user },
-      defaults: { id: 0, name: user, highscore: 0, highscore_date: null },
+      defaults: { id: 0, name: user, highscore: 0, highscoreDate: null },
     });
     if (!created) {
       return "Username already taken!";
@@ -23,7 +23,7 @@ const createAnonUser = async (user) => {
 const updateUserStatistics = async (user, elapsedTime) => {
   try {
     AnonUsers.increment(
-      { time_played: `+${elapsedTime}` },
+      { timePlayed: `+${elapsedTime}` },
       {
         where: {
           name: `${user}`,
@@ -42,11 +42,11 @@ const updateHighscore = async (score, user, elapsedTime) => {
   const date = new Date().toISOString().slice(0, 19).replace("T", " ");
   if (QuestionGenerator.verifyScores(score)) {
     try {
-      await sequelize.query(`update anon_users
+      await sequelize.query(`update anonusers
                               set highscore = ${score}
                               where name = "${user}"
                               and highscore < ${score}`);
-      await sequelize.query(`update anon_users set highscore_date="${date}"
+      await sequelize.query(`update anonusers set highscoreDate="${date}"
       where name="${user}"`);
     } catch ({ message }) {
       console.log(message);
@@ -55,8 +55,8 @@ const updateHighscore = async (score, user, elapsedTime) => {
     try {
       AnonUsers.update(
         {
-          last_game_score: score,
-          last_game_elapsed: elapsedTime,
+          lastGameScore: score,
+          lastGameElapsed: elapsedTime,
         },
         {
           where: {
@@ -73,10 +73,10 @@ const updateHighscore = async (score, user, elapsedTime) => {
     return "OK";
   } else {
     try {
-      await sequelize.query(`update anon_users
+      await sequelize.query(`update anonusers
                               set highscore = -99999
                               where name = "${user}"`);
-      await sequelize.query(`update anon_users set highscore_date="${date}"
+      await sequelize.query(`update anonusers set highscoreDate="${date}"
       where name="${user}"`);
       return "Cheater!!";
     } catch ({ message }) {

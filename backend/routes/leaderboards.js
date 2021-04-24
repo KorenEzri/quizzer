@@ -1,5 +1,5 @@
 const { Router } = require("express");
-const AnonUsers = require("../sequelize/models/AnonUsers");
+const AnonUsers = require("../models/anonusers");
 const leaderboards = Router();
 
 leaderboards.get("/getscores", async (req, res) => {

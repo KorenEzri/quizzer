@@ -1,6 +1,6 @@
 const { Router } = require("express");
-const SendRating = require("../sequelize/SendRating");
-const QuestionGenerator = require("../sequelize/QuestionGenerator");
+const SendRating = require("../SendRating");
+const QuestionGenerator = require("../QuestionGenerator");
 const rating = Router();
 
 rating.post("/ratequestion", (req, res) => {
