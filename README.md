@@ -1,5 +1,5 @@
 # Quizzer
-A self-learning world-trivia app that focuses on user reputation to calculate question scores and probability of various scenarios.
+## A self-learning world-trivia app that focuses on user reputation to calculate question scores and probability of various scenarios.
 
 ![](gamepic.PNG)
  
