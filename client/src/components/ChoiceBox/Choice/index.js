@@ -52,6 +52,7 @@ export default function Choice({
   let { answered } = useSelector((state) => state);
   let { failed } = useSelector((state) => state);
   const dispatch = useDispatch();
+  if (!choice) return;
 
   const findFullChoice = (userAnswer) => {
     let index;

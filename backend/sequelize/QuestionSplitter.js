@@ -15,13 +15,17 @@ const calculateChancesAndGetQuestion = async () => {
   await calculateInitialData(round);
   let random = Math.random() * 100;
   let chance;
+  if (questions.length) totalQuestionsAvailable = questions.length;
   if (totalQuestionsAvailable === 0) {
+    console.log("no questions in storage");
     chance = "!";
   }
   if (totalQuestionsAvailable < 100) {
-    chance = totalQuestionsAvailable * 0.06 + 0.1;
+    chance = (totalQuestionsAvailable * 0.06 + 0.1) * 10;
+    console.log("less than 100 questions left in storage");
   }
   if (totalQuestionsAvailable >= 100) {
+    console.log("over 100 questions in storage!");
     chance = 70;
   }
   if (random < chance && chance !== "!" && totalQuestionsAvailable > 0) {
@@ -67,7 +71,7 @@ const getQuestionFromDBstore = () => {
   if (question) {
     return { db: true, question };
   } else if (questions.length === 0) {
-    return { db: false };
+    return { db: "empty" };
   }
 };
 // RESETS THE DATA FUNCTION calculateInitialData() SETS UP AT THE BEGINNING OF A GAME
@@ -122,7 +126,6 @@ const calculateOddsAndGetElement = (array, chanceProperty) => {
   const random = Math.floor(
     Math.random() * (maxChance - minChance + 1) + minChance
   );
-  console.log(random);
   if (random < 5) {
     // 50% chance
     chancedQuestions = array.filter((item) => item[chanceProperty] <= 50);
@@ -131,7 +134,7 @@ const calculateOddsAndGetElement = (array, chanceProperty) => {
     // 20% chance
     chancedQuestions = array.filter((item) => item[chanceProperty] <= 20);
     return getRandomElements(chancedQuestions, 1);
-  } else if (random < 9) {
+  } else if (random < 10) {
     // 30% chance
     chancedQuestions = array.filter((item) => item[chanceProperty] <= 30);
     return getRandomElements(chancedQuestions, 1);

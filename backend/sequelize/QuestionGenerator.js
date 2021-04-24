@@ -88,10 +88,12 @@ const generateQuestion = async () => {
   if (question) {
     rawQuestion = question.question;
   }
-  if (db) {
+  if (db === true) {
     questionForClient = await getQuestionFromDB(rawQuestion);
-  } else {
+  } else if (db === "empty") {
     storageHasQuestions = false;
+    questionForClient = await generateRandomQuestion();
+  } else {
     questionForClient = await generateRandomQuestion();
   }
   console.log(
@@ -186,6 +188,7 @@ const generateRandomQuestion = async () => {
     question: questionBody.question,
     choices: questionBody.choices.falsies.concat([correctAnswer]),
   };
+
   return clientQuestion;
 };
 // calls FUNC getRelevantQuestionParams() => SWITCH case

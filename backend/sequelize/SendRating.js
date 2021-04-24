@@ -144,6 +144,7 @@ const saveRatings = async (
   } catch ({ message }) {
     console.log("ERROR with saveRating(), SendRating.js line ~23", message);
   }
+
   try {
     const [savedQuestion, created] = await SavedQuestions.findOrCreate({
       where: { question_full: `${question}` },
@@ -151,14 +152,20 @@ const saveRatings = async (
         question_id: 0,
         question_template: null,
         question_full: question,
-        choice_1_country: falsyChoices[0] ? falsyChoices[0].country : null,
+        choice_1_country: falsyChoices[0].country || null,
         choice_1_data: falsyChoices[0].data || falsyChoices[0],
         choice_2_country: falsyChoices[1] ? falsyChoices[1].country : null,
-        choice_2_data: falsyChoices[1].data || falsyChoices[1],
+        choice_2_data: falsyChoices[1]
+          ? falsyChoices[1].data
+          : falsyChoices[1] || null,
         choice_3_country: falsyChoices[2] ? falsyChoices[2].country : null,
-        choice_3_data: falsyChoices[2].data || falsyChoices[2],
+        choice_3_data: falsyChoices[2]
+          ? falsyChoices[2].data
+          : falsyChoices[2] || null,
         choice_correct_country: choices.rightChoice.country,
-        choice_correct_data: choices.rightChoice.data || choices.rightChoice,
+        choice_correct_data: choices.rightChoice
+          ? choices.rightChoice.data
+          : choices.rightChoice,
         score_1: getScore(rating, credibility, 1),
         score_2: getScore(rating, credibility, 2),
         score_3: getScore(rating, credibility, 3),
@@ -193,7 +200,7 @@ const saveRatings = async (
     }
   } catch ({ message }) {
     console.log(
-      "ERROR WITH saveRatings() at SendRating.js at ~line 79",
+      "ERROR WITH saveRatings() at SendRating.js at ~line 122",
       message
     );
   }

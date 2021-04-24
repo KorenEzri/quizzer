@@ -28,7 +28,9 @@ export default function ChoiceBox({
     new Set(
       shuffleChoices(
         choices.map((choice) => {
-          return choice[questionType] || choice;
+          if (choice) {
+            return choice[questionType] || choice;
+          } else return null;
         })
       )
     )
@@ -39,39 +41,48 @@ export default function ChoiceBox({
       <ul className="choice__list">
         {questionType !== "truefalse" ? (
           allChoices.map((choice, index) => {
-            let anyChoice = choice[questionType] || choice;
-            return (
-              <div className="choice__container" key={`CBcontainer${index}`}>
-                <Choice
-                  choices={choices}
-                  choice={anyChoice}
-                  index={index + 1}
-                  handleQuizStart={handleQuizStart}
-                  difficulty={difficulty}
-                />
-              </div>
-            );
+            let anyChoice;
+            if (choice) {
+              anyChoice = choice[questionType] || choice;
+            } else anyChoice = null;
+            if (choice) {
+              return (
+                <div className="choice__container" key={`CBcontainer${index}`}>
+                  <Choice
+                    choices={choices}
+                    choice={anyChoice}
+                    index={index + 1}
+                    handleQuizStart={handleQuizStart}
+                    difficulty={difficulty}
+                  />
+                </div>
+              );
+            }
           })
         ) : (
           <div className="truefalse_div-choiceBox-component">
-            <div className="choice__container">
-              <Choice
-                key={"true"}
-                choices={choices}
-                choice={allChoices[0].country || allChoices[0]}
-                difficulty={difficulty}
-                handleQuizStart={handleQuizStart}
-              />
-            </div>
-            <div className="choice__container">
-              <Choice
-                key={"false"}
-                choices={choices}
-                choice={allChoices[1].country || allChoices[1]}
-                difficulty={difficulty}
-                handleQuizStart={handleQuizStart}
-              />
-            </div>
+            {allChoices[0] && (
+              <div className="choice__container">
+                <Choice
+                  key={"true"}
+                  choices={choices}
+                  choice={allChoices[0].country || allChoices[0]}
+                  difficulty={difficulty}
+                  handleQuizStart={handleQuizStart}
+                />
+              </div>
+            )}
+            {allChoices[1] && (
+              <div className="choice__container">
+                <Choice
+                  key={"false"}
+                  choices={choices}
+                  choice={allChoices[1].country || allChoices[1]}
+                  difficulty={difficulty}
+                  handleQuizStart={handleQuizStart}
+                />
+              </div>
+            )}
           </div>
         )}
       </ul>
