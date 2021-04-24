@@ -2,11 +2,9 @@ const sequelize = require("./sequelize");
 const DataTypes = require("sequelize/lib/data-types");
 const Template = require("./models/questiontemplates")(sequelize, DataTypes); // QUESTION TEMPLATES
 const Countries = require("./models/countrydata")(sequelize, DataTypes); // COUNTRY DATA - RATES, REGIONS, ETC
-const IndependeceDays = require("./models/independencedays")(
-  sequelize,
-  DataTypes
-); // SELF EXPLANATORY
+const IndependeceDays = require("./models/independences")(sequelize, DataTypes); // SELF EXPLANATORY
 const { Sequelize } = require("sequelize");
+const Op = Sequelize.Op;
 const SendRating = require("./SendRating");
 const QuestionSplitter = require("./QuestionSplitter");
 /////////////////////////////////////
@@ -226,7 +224,7 @@ const getRelevantQuestionParams = async (reqs, template, list, ans_type) => {
       break;
     default:
       relevantCountries = getRandomElements(list, 1);
-      question = `${template}${relevantCountries[0].Country.trim()}?`;
+      question = `${template} ${relevantCountries[0].Country.trim()}?`;
       break;
   }
   const questionChoices = await getRelevantQuestionChoices(
@@ -337,7 +335,7 @@ const getAut_DateQCs = async (countries) => {
           "dateOfHoliday",
         ],
         where: {
-          Country: ` ${Country.trim()}`,
+          Country: { [Op.like]: `%${Country.trim()}%` },
         },
       });
       return {

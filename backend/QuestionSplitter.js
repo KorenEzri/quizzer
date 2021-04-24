@@ -17,6 +17,7 @@ const calculateChancesAndGetQuestion = async () => {
   await calculateInitialData(round);
   let random = Math.random() * 100;
   let chance;
+
   if (savedQuestions.length) totalQuestionsAvailable = savedQuestions.length;
   if (totalQuestionsAvailable === 0) {
     console.log("no questions in storage");
