@@ -14,7 +14,9 @@
     "path": "^0.12.7",
     "sequelize": "^6.6.2"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "sequelize-cli": "^6.2.0"
+  },
   "scripts": {
     "dev": "nodemon backend/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
