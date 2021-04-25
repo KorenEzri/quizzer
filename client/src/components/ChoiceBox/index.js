@@ -28,14 +28,13 @@ export default function ChoiceBox({
     new Set(
       shuffleChoices(
         choices.map((choice) => {
-          if (choice) {
-            return choice[questionType] || choice;
-          } else return null;
+          if (choice && choice !== null) {
+            return choice[questionType] ? choice[questionType] : choice;
+          }
         })
       )
     )
-  );
-
+  ).filter((element) => element != null);
   return (
     <div className="choiceBox-component">
       <ul className="choice__list">
@@ -44,8 +43,6 @@ export default function ChoiceBox({
             let anyChoice;
             if (choice) {
               anyChoice = choice[questionType] || choice;
-            } else anyChoice = null;
-            if (choice) {
               return (
                 <div className="choice__container" key={`CBcontainer${index}`}>
                   <Choice
@@ -61,28 +58,34 @@ export default function ChoiceBox({
           })
         ) : (
           <div className="truefalse_div-choiceBox-component">
-            {allChoices[0] && (
-              <div className="choice__container">
-                <Choice
-                  key={"true"}
-                  choices={choices}
-                  choice={allChoices[0].country || allChoices[0]}
-                  difficulty={difficulty}
-                  handleQuizStart={handleQuizStart}
-                />
-              </div>
-            )}
-            {allChoices[1] && (
-              <div className="choice__container">
-                <Choice
-                  key={"false"}
-                  choices={choices}
-                  choice={allChoices[1].country || allChoices[1]}
-                  difficulty={difficulty}
-                  handleQuizStart={handleQuizStart}
-                />
-              </div>
-            )}
+            <div className="choice__container">
+              <Choice
+                key={"true"}
+                choices={choices}
+                choice={
+                  allChoices[0].country ||
+                  allChoices[3].country ||
+                  allChoices[0] ||
+                  allChoices[3]
+                }
+                difficulty={difficulty}
+                handleQuizStart={handleQuizStart}
+              />
+            </div>
+            <div className="choice__container">
+              <Choice
+                key={"false"}
+                choices={choices}
+                choice={
+                  allChoices[1].country ||
+                  allChoices[2].country ||
+                  allChoices[2] ||
+                  allChoices[1]
+                }
+                difficulty={difficulty}
+                handleQuizStart={handleQuizStart}
+              />
+            </div>
           </div>
         )}
       </ul>

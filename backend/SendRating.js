@@ -6,8 +6,8 @@ const allRatingReqs = [];
 let tag = false;
 const getScore = (rating, credibility, check) => {
   if (rating === check) {
-    const calculatedRating = calculateCredibility(rating, credibility);
-    return calculatedRating;
+    // const calculatedRating = calculateCredibility(rating, credibility);
+    return rating;
   } else {
     return null;
   }
@@ -37,7 +37,8 @@ const updateQuestionScorings = async (
       );
     } catch ({ message }) {
       console.log(
-        "ERROR in updatedQuestionScorings() at SendRating.js at ~line 16"
+        "ERROR in updatedQuestionScorings() at SendRating.js at ~line 16",
+        message
       );
     }
   } else {
@@ -56,7 +57,8 @@ const updateQuestionScorings = async (
       );
     } catch ({ message }) {
       console.log(
-        "ERROR in updatedQuestionScorings() at SendRating.js at ~line 23"
+        "ERROR in updatedQuestionScorings() at SendRating.js at ~line 23",
+        message
       );
     }
   }
@@ -75,14 +77,13 @@ const receieveRatingRequest = (
     return "OK";
   }
   const ratingRequest = {
-    rating,
-    fullQuestion,
-    credibility,
-    name,
+    rating: rating,
+    fullQuestion: fullQuestion,
+    credibility: credibility,
+    name: name,
   };
   allRatingReqs.push(ratingRequest);
   console.log("RATING CACHE REQUEST RECEIVED AND SAVED");
-  console.log(fullQuestion);
 };
 const triggerRatingSequence = async (currentPlayerFS) => {
   if (allRatingReqs.length === 0 || tag) {
@@ -108,7 +109,8 @@ const triggerRatingSequence = async (currentPlayerFS) => {
           console.log(`request #${index + 1} succeeded`);
         } catch ({ message }) {
           console.log(
-            "ERROR WITH Promise.all inside triggerRatingSequence() at SendRating.js at ~line 56"
+            "ERROR WITH Promise.all inside triggerRatingSequence() at SendRating.js at ~line 89",
+            message
           );
         }
       })
@@ -130,7 +132,7 @@ const saveRatings = async (
   currentPlayerFS
 ) => {
   const { question, choices } = fullQuestion;
-  const falsyChoices = choices.falsies;
+  let falsyChoices = choices.falsies;
   let rawScore;
   let scoreWithRates;
   try {
@@ -147,7 +149,39 @@ const saveRatings = async (
   } catch ({ message }) {
     console.log("ERROR with saveRating(), SendRating.js line ~23", message);
   }
-
+  let numericFalsies = falsyChoices.map((choice) => {
+    if (!choices.falsies[0].country || !choices.falsies[0].data) {
+      return choice;
+    }
+  });
+  let choicelist;
+  if (numericFalsies[1]) {
+    choicelist = {
+      oneC: null,
+      oneD: numericFalsies[0],
+      twoC: null,
+      twoD: numericFalsies[1],
+      threeC: null,
+      threeD: numericFalsies[2],
+      rightC: choices.rightChoice.country,
+      rightD: choices.rightChoice.data
+        ? choices.rightChoice.data
+        : choices.rightChoice,
+    };
+  } else {
+    choicelist = {
+      oneC: falsyChoices[0].country || null,
+      oneD: falsyChoices[0].data || falsyChoices[0],
+      twoC: falsyChoices ? falsyChoices[1].country : null,
+      twoD: falsyChoices[1] ? falsyChoices[1].data : falsyChoices[1],
+      threeC: falsyChoices[2] ? falsyChoices[2].country : null,
+      threeD: falsyChoices[2] ? falsyChoices[2].data : falsyChoices[2],
+      rightC: choices.rightChoice.country,
+      rightD: choices.rightChoice.data
+        ? choices.rightChoice.data
+        : choices.rightChoice,
+    };
+  }
   try {
     const [savedQuestion, created] = await SavedQuestions.findOrCreate({
       where: { questionFull: `${question}` },
@@ -155,20 +189,14 @@ const saveRatings = async (
         id: 0,
         questionTemplate: null,
         questionFull: question,
-        choiceOneCountry: falsyChoices[0].country || null,
-        choiceOneData: falsyChoices[0].data || falsyChoices[0],
-        choiceTwoCountry: falsyChoices[1] ? falsyChoices[1].country : null,
-        choiceTwoData: falsyChoices[1]
-          ? falsyChoices[1].data
-          : falsyChoices[1] || null,
-        choiceThreeCountry: falsyChoices[2] ? falsyChoices[2].country : null,
-        choiceThreeData: falsyChoices[2]
-          ? falsyChoices[2].data
-          : falsyChoices[2] || null,
-        choiceCorrectCountry: choices.rightChoice.country,
-        choiceCorrectData: choices.rightChoice.data
-          ? choices.rightChoice.data
-          : choices.rightChoice,
+        choiceOneCountry: choicelist.oneC,
+        choiceOneData: choicelist.oneD,
+        choiceTwoCountry: choicelist.twoC,
+        choiceTwoData: choicelist.twoD,
+        choiceThreeCountry: choicelist.threeC,
+        choiceThreeData: choicelist.threeD,
+        choiceCorrectCountry: choicelist.rightC,
+        choiceCorrectData: choicelist.rightD,
         scoreOne: getScore(rating, credibility, 1),
         scoreTwo: getScore(rating, credibility, 2),
         scoreThree: getScore(rating, credibility, 3),
