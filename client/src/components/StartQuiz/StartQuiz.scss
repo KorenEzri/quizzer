@@ -5,6 +5,7 @@
 .start-button {
   user-select: none;
   margin-left: 1vw;
+  margin-top: 20vh !important;
   outline: none;
   box-shadow: 0px 1px 0px 0px #1c1b18;
   background: linear-gradient(to bottom, #eae0c2 5%, #ccc2a6 100%);
@@ -79,7 +80,7 @@
   cursor: pointer;
   user-select: none;
   position: absolute;
-  margin-top: 10vh;
+  margin-top: 28vh;
   font-size: 0.6cm;
   color: darkred;
   transition: 300ms;
