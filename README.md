@@ -1,7 +1,7 @@
 # Quizzer
 ## A self-learning world-trivia app that focuses on user reputation to calculate question scores and probability of various scenarios.
 
-![](gamepic.PNG)
+![](gamepic.png)
  
 # Introduction
 
@@ -38,7 +38,7 @@ The game includes three difficulty levels, each level with it's own extra bit of
 
 The game has a leaderboards page that displays all players' highscores, dates and a few more informatics:
 
-![](leaderboards.PNG)
+![](leaderboards.png)
 
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
