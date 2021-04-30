@@ -1,21 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import setCurrentQuestion from "../../redux/redux-actions/setCurrentQuestion";
-import setQuestionsFailed from "../../redux/redux-actions/setQuestionsFailed";
-import setCurrentChoices from "../../redux/redux-actions/setCurrentChoices";
+import setCurrentQuestion from "../../../redux/redux-actions/setCurrentQuestion";
+import setQuestionsFailed from "../../../redux/redux-actions/setQuestionsFailed";
+import setCurrentChoices from "../../../redux/redux-actions/setCurrentChoices";
 import classNames from "classnames";
 import "./Homepage.css";
-import Helpers from "../Helpers";
-import Question from "../Question";
-import Timer from "../Timer";
-import ChoiceBox from "../ChoiceBox";
-import BottomHUD from "../BottomHUD";
-import StartQuiz from "../StartQuiz";
-import RateLastQuestion from "../RateLastQuestion/";
-import Score from "../Scoreboard";
-import NavButtons from "../NavButtons";
-import LostTheGame from "../LostTheGame";
-import network from "../../network";
+import Helpers from "../../Helpers";
+import Question from "../../Question";
+import Timer from "../../Timer";
+import ChoiceBox from "../../ChoiceBox";
+import BottomHUD from "../../BottomHUD";
+import StartQuiz from "../../StartQuiz";
+import RateLastQuestion from "../../RateLastQuestion";
+import Score from "../../Scoreboard";
+import NavButtons from "../../NavButtons";
+import LostTheGame from "../../LostTheGame";
+import network from "../../../network";
 const baseUrl = "http://localhost:3001/api/questions/";
 const saveHighscore = "http://localhost:3001/api/users/highscore/";
 const triggerRatingSequence =
@@ -115,6 +115,7 @@ export default function Homepage() {
       setScore(answered.answerCount - failed.failedCount);
       handleDifficultyLevel(answered.answerCount);
     })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [answered, failed]);
 
   return quizStart ? (
