@@ -1,9 +1,8 @@
 const { Router } = require("express");
-const authController = require("./auth-controller");
 const { checkToken } = require("./middlewares/checkToken");
 const { checkRefreshToken } = require("./middlewares/checkRefresh");
 const jwt = "jsonwebtoken";
-
+const authController = require("./auth-controller");
 const authentication = Router();
 
 authentication.post("/register", async (req, res) => {
@@ -20,22 +19,21 @@ authentication.post("/register", async (req, res) => {
   }
 });
 authentication.post("/login", async (req, res) => {
-  const { email, password, rememberToken } = req.body;
+  const { username, password, rememberToken } = req.body;
   const requestingUser = {
-    email,
+    username,
     password,
     name: "",
-    isAdmin: false,
   };
   const loginRes = await authController.loginUser(requestingUser);
   if (loginRes.res === 2) {
     const responseBody = {
       accessToken: loginRes.accessToken,
-      refreshToken: loginRes.refreshToken,
-      email,
-      userName: loginRes.name,
-      isAdmin: loginRes.isAdmin,
+      refreshToken: loginRes.refreshToken.refreshToken,
+      email: loginRes.email,
+      nickname: loginRes.nickname,
     };
+    console.log(responseBody);
     res.status(200).send(responseBody);
   } else if (loginRes.res === 4) {
     res.status(404).json({ message: "cannot find user" });
@@ -48,7 +46,7 @@ authentication.post("/token", checkRefreshToken, async (req, res) => {
     const aud = Object.values(req.user)[2];
     const accessToken = await authController.generateAccessToken(aud);
     const refreshToken = await authController.generateRefreshToken(aud);
-    res.status(200).json({ accessToken, refreshToken });
+    res.status(200).send({ accessToken, refreshToken });
   }
 });
 authentication.post("/logout", (req, res) => {

@@ -16,7 +16,10 @@ import Score from "../../Scoreboard";
 import NavButtons from "../../NavButtons";
 import LostTheGame from "../../LostTheGame";
 import network from "../../../network";
+import setIsLogged from "../../../redux/redux-actions/setIsLogged";
+import Cookies from "js-cookie";
 const baseUrl = "http://localhost:3001/api/questions/";
+const validateUser = "http://localhost:3001/api/authentication/";
 const saveHighscore = "http://localhost:3001/api/users/highscore/";
 const triggerRatingSequence =
   "http://localhost:3001/api/rating/triggersequence";
@@ -117,6 +120,30 @@ export default function Homepage() {
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [answered, failed]);
+
+  useEffect(() => {
+    (async () => {
+      const interval = setInterval(async () => {
+        const config = {
+          headers: {
+            "Content-Type": "application/json;charset=utf-8'",
+            Authorization: `Berear ${Cookies.get("refreshToken")}`,
+          },
+        };
+        const { data } = await network.post(
+          `${validateUser}token`,
+          {
+            token: Cookies.get("refreshToken"),
+          },
+          config
+        );
+        if (data.accessToken) {
+          Cookies.set("accessToken", data.accessToken);
+        }
+      }, 269000);
+      return () => clearInterval(interval);
+    })();
+  });
 
   return quizStart ? (
     <div className="homepage-top-container">

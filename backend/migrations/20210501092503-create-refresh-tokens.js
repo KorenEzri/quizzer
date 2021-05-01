@@ -16,6 +16,9 @@ module.exports = {
       expires: {
         type: Sequelize.DATE,
       },
+      username: {
+        type: Sequelize.STRING,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

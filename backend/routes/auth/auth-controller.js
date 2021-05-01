@@ -12,15 +12,13 @@ const UserResponses = {
 
 const createFormattedDatePlusDays = (days) => {
   const newDate = new Date();
-  const numberOfDaysToAdd = days;
-  newDate.setDate(newDate.getDate() + numberOfDaysToAdd);
-  const dd = newDate.getDate();
-  const mm = newDate.getMonth() + 1;
-  const y = newDate.getFullYear();
-  const formattedDate = dd + "/" + mm + "/" + y;
+  const formattedDate = new Date(
+    newDate.getFullYear(),
+    newDate.getMonth(),
+    newDate.getDate() + 7
+  );
   return formattedDate;
 };
-
 const generateRefreshToken = async (username) => {
   const payload = {};
   const options = {
@@ -31,6 +29,7 @@ const generateRefreshToken = async (username) => {
   const refreshToken = {
     refreshToken: jwt.sign(payload, refreshTokenSecret, options),
     expires: new Date(`${createFormattedDatePlusDays()}`),
+    username: username,
   };
   const refreshTokenCreationRes = await sequelizeUtils.createRefreshToken(
     refreshToken
@@ -38,21 +37,20 @@ const generateRefreshToken = async (username) => {
   if (refreshTokenCreationRes === "OK") {
     return refreshToken;
   } else if (refreshTokenCreationRes === "Token already taken!") {
-    generateRefreshToken();
+    generateRefreshToken(username);
   } else if (refreshTokenCreationRes === "ERROR") {
     return "ERROR";
   }
 };
-
 const generateAccessToken = async (username) => {
   if (typeof username === "string") {
     const foundUser = sequelizeUtils.findOneUser(username);
     return jwt.sign({ user: foundUser }, tokenSecret, {
-      expiresIn: "1h",
+      expiresIn: "5m",
     });
   } else {
     return jwt.sign({ user: username }, tokenSecret, {
-      expiresIn: "1h",
+      expiresIn: "5m",
     });
   }
 };
@@ -90,17 +88,17 @@ const createUser = async (user) => {
   }
 };
 const loginUser = async (user) => {
-  const isUser = sequelizeUtils.findOneUser(user.username);
+  const isUser = await sequelizeUtils.findOneUser(user.username);
   if (!isUser) return { res: UserResponses.USER_NOT_FOUND };
   const isValidated = await bcrypt.compare(user.password, isUser.password);
   if (isValidated) {
     user.password = "";
     const accessToken = await generateAccessToken(isUser);
-    const refreshToken = await generateRefreshToken(isUser.name);
+    const refreshToken = await generateRefreshToken(isUser.username);
     return {
       res: UserResponses.SUCCESS,
       accessToken,
-      nickName: isUser.nickName,
+      nickname: isUser.nickname,
       email: isUser.email,
       refreshToken,
     };

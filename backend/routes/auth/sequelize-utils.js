@@ -23,22 +23,34 @@ const findOneUser = async (username) => {
 };
 const createRefreshToken = async (token) => {
   try {
-    const [newRefreshToken, created] = await refreshTokens.findOrCreate({
-      where: { refreshToken: token.refreshToken },
+    const [oldRefreshToken, created] = await refreshTokens.findOrCreate({
+      where: { username: token.username },
       defaults: {
         refreshToken: token.refreshToken,
         expires: token.expires,
+        username: token.username,
       },
     });
     if (!created) {
-      return "Token already taken!";
+      oldRefreshToken.refreshToken = token.refreshToken;
+      oldRefreshToken.expires = token.expires;
+      try {
+        await oldRefreshToken.save();
+      } catch ({ message }) {
+        console.log(
+          "ERROR WITH createRefreshToken() at sequelize-utils.js at ~line 25",
+          message
+        );
+      }
+      return "OK";
     }
     if (created) {
       return "OK";
     }
   } catch ({ message }) {
     console.log(
-      "ERROR WITH createRefreshToken() at sequelize-utils.js at ~line 25"
+      "ERROR WITH createRefreshToken() at sequelize-utils.js at ~line 25",
+      message
     );
     return "ERROR";
   }

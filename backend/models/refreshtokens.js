@@ -15,6 +15,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       refreshToken: DataTypes.STRING,
       expires: DataTypes.DATE,
+      username: DataTypes.STRING,
     },
     {
       sequelize,
