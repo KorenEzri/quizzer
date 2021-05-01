@@ -16,7 +16,6 @@ import Score from "../../Scoreboard";
 import NavButtons from "../../NavButtons";
 import LostTheGame from "../../LostTheGame";
 import network from "../../../network";
-import setIsLogged from "../../../redux/redux-actions/setIsLogged";
 import Cookies from "js-cookie";
 const baseUrl = "http://localhost:3001/api/questions/";
 const validateUser = "http://localhost:3001/api/authentication/";
@@ -102,7 +101,7 @@ export default function Homepage() {
     clearInterval(questionInterval);
     await network.post(saveHighscore, {
       score,
-      user: localStorage.getItem("anon"),
+      user: Cookies.get("username"),
       elapsedTime,
     });
   };
@@ -140,7 +139,7 @@ export default function Homepage() {
         if (data.accessToken) {
           Cookies.set("accessToken", data.accessToken);
         }
-      }, 269000);
+      }, 120000);
       return () => clearInterval(interval);
     })();
   });
@@ -169,7 +168,7 @@ export default function Homepage() {
           <div className="question__container">
             <Question question={question.question} />
             <div className="scoreboard-container">
-              {localStorage.getItem("anon")} <Score playerScore={score} />
+              {Cookies.get("nickname")} <Score playerScore={score} />
             </div>
           </div>
           <div

@@ -32,7 +32,7 @@ module.exports = {
         type: Sequelize.INTEGER,
       },
       highscoreDate: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.DATE,
       },
       timePlayed: {
         type: Sequelize.INTEGER,

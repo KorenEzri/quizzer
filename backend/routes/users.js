@@ -19,6 +19,7 @@ users.post("/createanon", async (req, res) => {
 });
 users.post("/highscore", async (req, res) => {
   const { score, user, elapsedTime } = req.body;
+  console.log(score, user, elapsedTime);
   try {
     res
       .status(200)

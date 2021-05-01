@@ -39,6 +39,7 @@ export default function LoginPage() {
           Cookies.set("refreshToken", data.refreshToken);
           Cookies.set("nickname", data.nickname);
           Cookies.set("email", data.email);
+          Cookies.set("username", data.username);
         }
       } catch ({ message }) {
         console.log(message);
@@ -59,7 +60,7 @@ export default function LoginPage() {
       </div>
       <form autoComplete="off">
         <div className="testbox">
-          <h1>Employee Login</h1>
+          <h1>Login</h1>
           <div className="user-info">
             <input
               type="text"

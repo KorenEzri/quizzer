@@ -101,6 +101,7 @@ const loginUser = async (user) => {
       nickname: isUser.nickname,
       email: isUser.email,
       refreshToken,
+      username: isUser.username,
     };
   } else {
     return { res: UserResponses.INCORRECT_INPUT };

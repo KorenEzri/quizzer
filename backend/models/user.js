@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
       lastName: DataTypes.STRING,
       nickname: DataTypes.STRING,
       highscore: DataTypes.INTEGER,
-      highscoreDate: DataTypes.INTEGER,
+      highscoreDate: DataTypes.DATE,
       timePlayed: DataTypes.INTEGER,
       lastRating: DataTypes.INTEGER,
       lastGameScore: DataTypes.INTEGER,

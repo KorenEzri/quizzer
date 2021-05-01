@@ -27,11 +27,13 @@ authentication.post("/login", async (req, res) => {
   };
   const loginRes = await authController.loginUser(requestingUser);
   if (loginRes.res === 2) {
+    console.log(loginRes);
     const responseBody = {
       accessToken: loginRes.accessToken,
       refreshToken: loginRes.refreshToken.refreshToken,
       email: loginRes.email,
       nickname: loginRes.nickname,
+      username: loginRes.username,
     };
     console.log(responseBody);
     res.status(200).send(responseBody);

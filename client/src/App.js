@@ -15,29 +15,27 @@ const baseUrl = "http://localhost:3001/api/authentication/";
 
 function App() {
   const dispatch = useDispatch();
-
   useEffect(() => {
     (async () => {
       const token = Cookies.get("accessToken");
-      if (token) {
+      if (!token) dispatch(setIsLogged(false));
+      else if (token) {
         const { data } = await network.post(`${baseUrl}tokenValidate`);
         data.valid === true
           ? dispatch(setIsLogged(true))
           : dispatch(setIsLogged(false));
-      } else {
-        dispatch(setIsLogged(false));
       }
     })();
-  }, []);
+  });
 
   return (
     <Router history={history}>
       <div className="top-container">
         <Switch>
-          <PrivateRoute exact path="/" component={Homepage} />
           <Route exact path="/login" component={Login} />
           <Route exact path="/register" component={Register} />
           <Route exact path="/leaderboards" component={Leaderboards} />
+          <PrivateRoute exact path="/" component={Homepage} />
         </Switch>
       </div>
     </Router>
