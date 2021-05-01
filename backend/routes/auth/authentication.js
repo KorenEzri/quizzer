@@ -1,5 +1,5 @@
 const { Router } = require("express");
-const userController = "./userController";
+const authController = require("./auth-controller");
 const { checkToken } = require("./middlewares/checkToken");
 const { checkRefreshToken } = require("./middlewares/checkRefresh");
 const jwt = "jsonwebtoken";
@@ -8,8 +8,7 @@ const authentication = Router();
 
 authentication.post("/register", async (req, res) => {
   const newUser = req.body;
-  console.log(newUser);
-  const creationRes = await userController.createUser(newUser);
+  const creationRes = await authController.createUser(newUser);
   if (creationRes === 1) {
     res.status(409).json({ message: "user already taken" });
   } else if (creationRes === 2) {
@@ -28,7 +27,7 @@ authentication.post("/login", async (req, res) => {
     name: "",
     isAdmin: false,
   };
-  const loginRes = await userController.loginUser(requestingUser);
+  const loginRes = await authController.loginUser(requestingUser);
   if (loginRes.res === 2) {
     const responseBody = {
       accessToken: loginRes.accessToken,
@@ -47,8 +46,8 @@ authentication.post("/login", async (req, res) => {
 authentication.post("/token", checkRefreshToken, async (req, res) => {
   if (req.user) {
     const aud = Object.values(req.user)[2];
-    const accessToken = await userController.generateAccessToken(aud);
-    const refreshToken = await userController.generateRefreshToken(aud);
+    const accessToken = await authController.generateAccessToken(aud);
+    const refreshToken = await authController.generateRefreshToken(aud);
     res.status(200).json({ accessToken, refreshToken });
   }
 });
@@ -57,7 +56,7 @@ authentication.post("/logout", (req, res) => {
   if (!token) {
     res.status(400).send("Refresh Token Required");
   } else {
-    jwt.verify(token, userController.refreshTokenSecret, (err, decoded) => {
+    jwt.verify(token, authController.refreshTokenSecret, (err, decoded) => {
       if (err) {
         res.status(400).send("Invalid Refresh Token");
       }

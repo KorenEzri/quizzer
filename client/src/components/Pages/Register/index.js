@@ -9,10 +9,37 @@ import Navbar from "../../Navbar";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import { Redirect } from "react-router-dom";
+import network from "../../../network";
+const baseUrl = "http://localhost:3001/api/authentication/";
 
 export default function RegisterPage() {
   const [checked, setChecked] = React.useState(true);
   const [isRegistered, setIsRegistered] = React.useState(false);
+
+  const sendRegistrationQuery = async (event) => {
+    try {
+      const {
+        email,
+        firstName,
+        lastName,
+        username,
+        password,
+        nickname,
+      } = event.target;
+      const user = {
+        email: email.value,
+        firstName: firstName.value,
+        lastName: lastName.value,
+        username: username.value,
+        password: password.value,
+        nickname: nickname.value,
+      };
+      const { data } = await network.post(`${baseUrl}register`, user);
+      console.log(data);
+    } catch ({ message }) {
+      console.log(message);
+    }
+  };
 
   return (
     <div>
@@ -22,8 +49,10 @@ export default function RegisterPage() {
         <div>
           <Navbar />
           <form
-            onSubmit={() => {
-              console.log("object");
+            onSubmit={async (event) => {
+              event.preventDefault();
+              await sendRegistrationQuery(event);
+              setIsRegistered(true);
             }}
           >
             <div className="testbox">
@@ -71,6 +100,14 @@ export default function RegisterPage() {
                   name="username"
                   autoComplete="off"
                   placeholder="Username (unique)"
+                  required
+                />
+                <AccountCircleIcon className="icons" />
+                <input
+                  type="text"
+                  name="nickname"
+                  autoComplete="off"
+                  placeholder="Nickname"
                   required
                 />
                 <AccountCircleIcon className="icons" />

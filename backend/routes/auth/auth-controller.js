@@ -1,5 +1,6 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const sequelizeUtils = require("./sequelize-utils");
 
 const UserResponses = {
   ALREADY_TAKEN: 1,
@@ -9,6 +10,17 @@ const UserResponses = {
   INCORRECT_INPUT: 5,
 };
 
+const createFormattedDatePlusDays = (days) => {
+  const newDate = new Date();
+  const numberOfDaysToAdd = days;
+  newDate.setDate(newDate.getDate() + numberOfDaysToAdd);
+  const dd = newDate.getDate();
+  const mm = newDate.getMonth() + 1;
+  const y = newDate.getFullYear();
+  const formattedDate = dd + "/" + mm + "/" + y;
+  return formattedDate;
+};
+
 const generateRefreshToken = async (username) => {
   const payload = {};
   const options = {
@@ -16,110 +28,39 @@ const generateRefreshToken = async (username) => {
     audience: `${username}`,
     issuer: "KorenimBaam",
   };
-  const refreshToken = jwt.sign(payload, refreshTokenSecret, options);
-  if (!REFRESHTOKENS.some((token) => token === refreshToken)) {
-    REFRESHTOKENS.push(refreshToken);
+  const refreshToken = {
+    refreshToken: jwt.sign(payload, refreshTokenSecret, options),
+    expires: new Date(`${createFormattedDatePlusDays()}`),
+  };
+  const refreshTokenCreationRes = await sequelizeUtils.createRefreshToken(
+    refreshToken
+  );
+  if (refreshTokenCreationRes === "OK") {
+    return refreshToken;
+  } else if (refreshTokenCreationRes === "Token already taken!") {
+    generateRefreshToken();
+  } else if (refreshTokenCreationRes === "ERROR") {
+    return "ERROR";
   }
-  return refreshToken;
 };
-const generateAccessToken = async (user) => {
-  if (typeof user === "string") {
-    const foundUser = USERS.find(
-      (registeredUser) => registeredUser.name === user
-    );
+
+const generateAccessToken = async (username) => {
+  if (typeof username === "string") {
+    const foundUser = sequelizeUtils.findOneUser(username);
     return jwt.sign({ user: foundUser }, tokenSecret, {
-      expiresIn: "10s",
+      expiresIn: "1h",
     });
   } else {
-    return jwt.sign({ user: user }, tokenSecret, {
-      expiresIn: "10s",
+    return jwt.sign({ user: username }, tokenSecret, {
+      expiresIn: "1h",
     });
   }
 };
 const tokenSecret = "VERYSEXYTOKENSECRETIHAVE";
 const refreshTokenSecret = "VERYSEXYREFTOKENSECRETIHAVE";
 const saltRounds = 10;
-const USERS = [];
-const INFORMATION = [];
-const REFRESHTOKENS = [];
-const OPTIONS = [
-  {
-    register: {
-      method: "post",
-      path: "/users/register",
-      description: "Register, Required: email, name, password",
-      example: {
-        body: { email: "user@email.com", name: "user", password: "password" },
-      },
-    },
-  },
-  {
-    login: {
-      method: "post",
-      path: "/users/login",
-      description: "Login, Required: valid email and password",
-      example: { body: { email: "user@email.com", password: "password" } },
-    },
-  },
-  {
-    renewToken: {
-      method: "post",
-      path: "/users/token",
-      description: "Renew access token, Required: valid refresh token",
-      example: { headers: { token: "*Refresh Token*" } },
-    },
-  },
-  {
-    validateToken: {
-      method: "post",
-      path: "/users/tokenValidate",
-      description: "Access Token Validation, Required: valid access token",
-      example: { headers: { Authorization: "Bearer *Access Token*" } },
-    },
-  },
-  {
-    userInfo: {
-      method: "get",
-      path: "/api/v1/information",
-      description: "Access user's information, Required: valid access token",
-      example: { headers: { Authorization: "Bearer *Access Token*" } },
-    },
-  },
-  {
-    logout: {
-      method: "post",
-      path: "/users/logout",
-      description: "Logout, Required: access token",
-      example: { body: { token: "*Refresh Token*" } },
-    },
-  },
-  {
-    allUsers: {
-      method: "get",
-      path: "api/v1/users",
-      description: "Get users DB, Required: Valid access token of admin user",
-      example: { headers: { authorization: "Bearer *Access Token*" } },
-    },
-  },
-];
-const adminPass = "Rc123456!";
-const adminUser = {
-  email: "admin@email.com",
-  name: "admin",
-  password: adminPass,
-  isAdmin: true,
-};
 
 const createUser = async (user) => {
-  if (
-    USERS.filter((existingUser) => {
-      return (
-        existingUser.name === user.name || existingUser.email === user.email
-      );
-    }).length > 0
-  ) {
-    return UserResponses.ALREADY_TAKEN;
-  }
   let hashedPassword;
   try {
     await bcrypt.hash(user.password, saltRounds, async (err, hash) => {
@@ -129,28 +70,27 @@ const createUser = async (user) => {
       } else {
         hashedPassword = hash;
         const newUser = {
-          name: user.name,
+          username: user.username,
           email: user.email,
           password: hashedPassword,
-          isAdmin: user.isAdmin || false,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          nickname: user.nickname,
         };
-        USERS.push(newUser);
-        INFORMATION.push({ email: user.email, info: `${user.name} info` });
+        sequelizeUtils.createUser(newUser);
       }
     });
     return UserResponses.SUCCESS;
   } catch ({ message }) {
     console.log(
-      "ERROR WITH createUser() at userController.ts at line ~14, ",
+      "ERROR WITH createUser() at auth-controller.js at ~line 73",
       message
     );
     return UserResponses.ERROR;
   }
 };
 const loginUser = async (user) => {
-  const isUser = USERS.filter((existingUser) => {
-    return existingUser.email === user.email;
-  })[0];
+  const isUser = sequelizeUtils.findOneUser(user.username);
   if (!isUser) return { res: UserResponses.USER_NOT_FOUND };
   const isValidated = await bcrypt.compare(user.password, isUser.password);
   if (isValidated) {
@@ -160,32 +100,20 @@ const loginUser = async (user) => {
     return {
       res: UserResponses.SUCCESS,
       accessToken,
-      name: isUser.name,
+      nickName: isUser.nickName,
       email: isUser.email,
-      isAdmin: isUser.isAdmin,
       refreshToken,
     };
   } else {
     return { res: UserResponses.INCORRECT_INPUT };
   }
 };
-const getUserInfoByMail = (email) => {
-  const userInfo = INFORMATION.find((userEmail) => userEmail.email === email);
-  if (userInfo) {
-    return [{ user: userInfo.email, info: userInfo.info }];
-  }
-};
-
-createUser(adminUser);
 
 module.exports = {
   createUser,
   loginUser,
-  getUserInfoByMail,
   generateAccessToken,
   generateRefreshToken,
-  USERS,
-  OPTIONS,
   tokenSecret,
   refreshTokenSecret,
 };
