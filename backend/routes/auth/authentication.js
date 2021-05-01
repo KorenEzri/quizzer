@@ -1,7 +1,7 @@
 const { Router } = require("express");
 const { checkToken } = require("./middlewares/checkToken");
 const { checkRefreshToken } = require("./middlewares/checkRefresh");
-const jwt = "jsonwebtoken";
+const jwt = require("jsonwebtoken");
 const authController = require("./auth-controller");
 const authentication = Router();
 

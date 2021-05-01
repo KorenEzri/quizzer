@@ -1,12 +1,28 @@
 import React from "react";
-import { useState } from "react";
+import Cookies from "js-cookie";
+import { useDispatch } from "react-redux";
+import setIsLogged from "../../redux/redux-actions/setIsLogged";
 import { NavLink } from "react-router-dom";
 import history from "../../history";
 import network from "../../network";
 import "./StartQuiz.css";
 import simpsonImage from "./sim.jpg";
+const baseUrl = "http://localhost:3001/api/authentication/";
 
 export default function StartQuiz({ handleQuizStart }) {
+  const dispatch = useDispatch();
+  const logOut = async () => {
+    const { data } = await network.post(`${baseUrl}logout`, {
+      token: Cookies.get("refreshToken"),
+    });
+    console.log(data);
+    Cookies.remove("accessToken");
+    Cookies.remove("refreshToken");
+    Cookies.remove("username");
+    Cookies.remove("nickname");
+    Cookies.remove("email");
+    dispatch(setIsLogged(false));
+  };
   return (
     <div
       className="start-quiz-component"
@@ -36,7 +52,14 @@ export default function StartQuiz({ handleQuizStart }) {
               Leaderboards
             </h1>
           </NavLink>
-          <button className="logout-button">Log out</button>
+          <button
+            className="logout-button"
+            onClick={() => {
+              logOut();
+            }}
+          >
+            Log out
+          </button>
           <button
             className="start-button"
             onClick={async () => {

@@ -17,6 +17,7 @@ import NavButtons from "../../NavButtons";
 import LostTheGame from "../../LostTheGame";
 import network from "../../../network";
 import Cookies from "js-cookie";
+import setIsLogged from "../../../redux/redux-actions/setIsLogged";
 const baseUrl = "http://localhost:3001/api/questions/";
 const validateUser = "http://localhost:3001/api/authentication/";
 const saveHighscore = "http://localhost:3001/api/users/highscore/";
@@ -33,7 +34,7 @@ export default function Homepage() {
   const [questionInterval, setQuestionInterval] = useState("");
   const [elapsedTime, setElapsedTime] = useState(0);
   const [startDate, setStartDate] = useState(0);
-  let { answered, failed, question } = useSelector((state) => state);
+  let { answered, failed, question, isLogged } = useSelector((state) => state);
 
   const fetchQuestion = async (didClick) => {
     const { data } = await network.get(`${baseUrl}question`);
@@ -108,6 +109,9 @@ export default function Homepage() {
 
   useEffect(() => {
     (async () => {
+      if (!Cookies.get("accessToken")) {
+        dispatch(setIsLogged(false));
+      }
       if (!quizStart) return;
       if (failed.failedCount > 2) {
         setLostGame(true);
