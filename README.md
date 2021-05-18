@@ -1,3 +1,19 @@
+## How to: run locally
+### config file in cd backend/config/config.json - username root, password 1234, database "quizzz".
+- cd backend
+- npm i
+- cd ..
+- cd client
+- npm i
+- cd ..
+- cd backend
+- npx sequelize db:migrate 
+- npx sequelize db:seed:all
+- npm start
+- cd ..
+- cd client
+- npm start
+
 # Quizzer
 ## A self-learning world-trivia app that focuses on user reputation to calculate question scores and probability of various scenarios.
 
